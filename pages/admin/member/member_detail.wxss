@@ -76,6 +76,10 @@
 .bind-link { color: #006495; font-size: 25rpx; margin-left: 20rpx; }
 .bind-qr-hint { font-size: 26rpx; color: #3f4850; text-align: center; margin: 20rpx 0; }
 .bind-qr-image { display: block; width: 360rpx; height: 360rpx; margin: 0 auto; }
+/* 转发给客人：app.wxss 的全局 button（高 65rpx、上内边距 10rpx、groove 边框）会把字切掉，这里自己定高；不用 size="mini"（它的内置样式优先级更高） */
+.modal .bind-share-btn { display: block; width: 100%; height: 88rpx; line-height: 88rpx; padding: 0; margin: 24rpx 0 0; border: none; border-radius: 18rpx;
+  background: #006495; color: #fff; font-size: 30rpx; font-weight: 700; text-align: center; }
+.modal .bind-share-btn::after { border: none; }
 .acc-v { font-size: 26rpx; color: #0b1c30; font-weight: 600; }
 .otab { white-space: nowrap; margin-bottom: 6rpx; }
 .otab-item { display: inline-block; height: 56rpx; line-height: 56rpx; padding: 0 24rpx; margin-right: 12rpx;

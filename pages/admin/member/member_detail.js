@@ -15,6 +15,7 @@ Page({
     wechatBindShow: false,
     wechatBindImage: '',
     wechatBindMessage: '',
+    wechatBindToken: '',   // 绑定码本身（后端 Create 返回），只用来拼「转发给客人」的小程序卡片路径；没有就不显示转发按钮
 
     // 标签编辑弹层
     tagSheetShow: false,
@@ -78,6 +79,8 @@ Page({
   onLoad(options) {
     var that = this
     this.setData({ memberId: parseInt(options.id) || 0 })
+    // 会员详情是店员页面，右上角菜单的「转发」隐藏；只有绑定弹层里的「转发给客人」按钮能转发（按钮不受影响）
+    if (typeof wx !== 'undefined' && typeof wx.hideShareMenu === 'function') wx.hideShareMenu()
     this._loadTagLibrary()
     Promise.resolve(app.loginPromiseNew).then(function () {
       var staff = app.globalData.staff
@@ -102,7 +105,7 @@ Page({
     this._stopWechatBindPolling()
     this._cancelWechatBind()
     this._wechatBindId = null
-    this.setData({ wechatBindShow: true, wechatBindImage: '', wechatBindMessage: '正在生成二维码…' })
+    this.setData({ wechatBindShow: true, wechatBindImage: '', wechatBindToken: '', wechatBindMessage: '正在生成二维码…' })
     const base = app.globalData.requestPrefix + 'MemberWechatBind/'
     const key = encodeURIComponent(app.globalData.sessionKey || '')
     util.performWebRequest(base + 'Create?memberId=' + this.data.memberId + '&sessionKey=' + key, {})
@@ -112,7 +115,8 @@ Page({
         const info = wx.getAccountInfoSync()
         const version = (info.miniProgram && info.miniProgram.envVersion) || 'release'
         this.setData({ wechatBindImage: base + 'Image?id=' + qr.id + '&sessionKey=' + key + '&envVersion=' + version,
-          wechatBindMessage: '请会员扫码并授权本人手机号，二维码 30 分钟内有效' })   // 有效期以后端 MemberWechatBindController.QrValidMinutes 为准，改的时候两边一起改
+          wechatBindToken: (qr && qr.token) || '',
+          wechatBindMessage: '请会员扫码并授权本人手机号，二维码 30 分钟内有效，绑定完成前请勿关闭本窗口' })   // 有效期以后端 MemberWechatBindController.QrValidMinutes 为准，改的时候两边一起改
         this._startWechatBindPolling()
       }).catch(() => {
         if (seq === this._wechatBindSeq) this.setData({ wechatBindMessage: '生成失败，请重试' })
@@ -123,13 +127,25 @@ Page({
     this._stopWechatBindPolling()
     this._cancelWechatBind()
     this._wechatBindId = null
-    this.setData({ wechatBindShow: false, wechatBindImage: '' })
+    this.setData({ wechatBindShow: false, wechatBindImage: '', wechatBindToken: '' })
+  },
+  // 「转发给客人」：把绑定二维码里的绑定码做成小程序卡片，客人点开就是绑定页（pages/member/wechat_bind 本来就从 options.scene 取绑定码，扫码和点卡片同一条路）。
+  // 只响应弹层里的转发按钮；没有绑定码（旧后端 / 已关闭）或格式不对一律返回空，不会把别的会员页面转出去。
+  onShareAppMessage(res) {
+    const token = this.data.wechatBindToken
+    if (!res || res.from !== 'button' || !/^[0-9a-f]{24}$/.test(token || '')) return {}
+    const host = (app.globalData && app.globalData.domainName) || 'mini.snowmeet.top'
+    return {
+      title: '请授权您的手机号，绑定微信',
+      path: '/pages/member/wechat_bind?scene=' + token,
+      imageUrl: 'https://' + host + '/images/snowmeet_logo.png'
+    }
   },
   onWechatBindImageError(e) {
     if (!e.currentTarget || e.currentTarget.dataset.src !== this.data.wechatBindImage) return
     this._cancelWechatBind()
     this._wechatBindId = null
-    this.setData({ wechatBindImage: '', wechatBindMessage: '二维码图片生成失败，请重试' })
+    this.setData({ wechatBindImage: '', wechatBindToken: '', wechatBindMessage: '二维码图片生成失败，请重试' })
     this._stopWechatBindPolling()
   },
   _cancelWechatBind(id) {
@@ -158,7 +174,7 @@ Page({
           wx.showToast({ title: '微信绑定成功', icon: 'success' })
         } else if (result.stage === 'expired') {
           this._stopWechatBindPolling()
-          this.setData({ wechatBindImage: '', wechatBindMessage: '二维码已过期，请重新生成' })
+          this.setData({ wechatBindImage: '', wechatBindToken: '', wechatBindMessage: '二维码已过期，请重新生成' })
         }
       }).catch(err => console.warn('查询微信绑定状态失败', err))
     }, 2000)
