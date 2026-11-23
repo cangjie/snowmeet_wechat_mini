@@ -3,3 +3,19 @@
 .title { font-size: 36rpx; font-weight: 700; }
 .hint, .message { font-size: 27rpx; line-height: 1.6; margin: 28rpx 0; color: #3f4850; }
 .message { color: #006495; }
+/* 授权按钮：app.wxss 给所有 button 设了固定高度 65rpx、padding-top 10rpx 和凹槽边框，文字会被切掉，这里自己定高度（文字垂直居中、完整显示）。
+   不能写 size="mini"：它的内置样式优先级更高，会盖掉这里的字号和行高。 */
+.card .bind-btn {
+  display: block;
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin: 36rpx 0 0;
+  padding: 0;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+}
+.card .bind-btn::after { border: none; }
