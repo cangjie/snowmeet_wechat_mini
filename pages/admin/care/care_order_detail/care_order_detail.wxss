@@ -310,6 +310,20 @@
 .btn--danger { background: #e64340; color: #ffffff; }
 .btn--warning { background: #d97706; color: #ffffff; }
 .btn--plain { background: #ffffff; color: #006495; border: 1rpx solid #bfd7e4; }
+/* 打印标签存根 / 打印顾客小票：实心大按钮，一左一右撑满一行，比普通按钮醒目得多（用户 2026-11-25 要求）。
+   小票用深一点的蓝色和存根区分开。 */
+.btn--print {
+  flex: 1;
+  min-height: 96rpx;
+  padding: 0 24rpx;
+  border-radius: 16rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  box-shadow: 0 6rpx 16rpx rgba(0, 100, 149, 0.35);
+}
+.btn--print-receipt { background: #00476b; box-shadow: 0 6rpx 16rpx rgba(0, 71, 107, 0.35); }
+.btn--print:active { opacity: 0.85; }
 
 /* 发板核销 */
 .deal-method-row, .veri-row {
