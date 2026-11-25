@@ -11,18 +11,7 @@
     "pages/mine/ticket/ticket_claim/ticket_claim",
     "pages/mine/ticket/ticket_share_mini",
     "pages/mine/ticket/ticket_claim_mini/ticket_claim_mini",
-    "pages/admin/rent/rent_report",
-    "pages/admin/rent/punchcard_products/punchcard_products",
-    "pages/admin/rent/punchcard_products/punchcard_product_detail/punchcard_product_detail",
-    "pages/admin/rent/punchcard_sales/punchcard_sales",
     "pages/admin/recept/recept_list",
-    "pages/admin/rent/unreturned",
-    "pages/admin/rent/settings/category_tree",
-    "pages/admin/rent/settings/rent_package",
-    "pages/admin/rent/settings/rent_package_list",
-    "pages/admin/rent/settings/rent_product_list",
-    "pages/admin/rent/settings/rent_product",
-    "pages/admin/rent/settings/rent_product_add",
     "pages/register/out_reg",
     "pages/mine/skipass/my_skipass",
     "pages/admin/ski_pass/common_skipass_list",
@@ -45,8 +34,6 @@
     "pages/punchcard/punchcard_confirm",
     "pages/admin/deposit/deposit_account_list",
     "pages/admin/deposit/deposit_account_detail",
-    "pages/admin/rent/rent_order_detail/rent_order_detail",
-    "pages/admin/rent/rent_append",
     "pages/register/reg",
     "pages/admin/retail/retail_order_list",
     "pages/admin/retail/retail_order_detail",
@@ -58,7 +45,6 @@
     "pages/trial/index",
     "pages/trial/checkin",
     "pages/trial/staff",
-    "pages/admin/rent/new_rent_list",
     "pages/admin/member/member_list",
     "pages/admin/member/member_detail",
     "pages/admin/member/member_register",
@@ -70,7 +56,6 @@
     "pages/admin/care/care_order_detail/care_order_detail",
     "pages/admin/fnb/mat_expire_list/mat_expire_list",
     "pages/admin/fnb/mat_expire_detail/mat_expire_detail",
-    "pages/admin/rent/search_fuzzy",
     "pages/admin/unipay/unipay",
     "pages/admin/unipay/unipay_detail",
     "pages/admin/unipay/unipay_list",
@@ -111,6 +96,14 @@
   "lazyCodeLoading": "requiredComponents",
   "networkTimeout": {
     "uploadFile": 300000
+  },
+  "preloadRule": {
+    "pages/admin/admin": {
+      "network": "all",
+      "packages": [
+        "rentadmin"
+      ]
+    }
   },
   "subPackages": [
     {
@@ -195,6 +188,27 @@
         "bindcode/bindcode",
         "bind/bind",
         "selfreg/selfreg"
+      ]
+    },
+    {
+      "root": "pages/admin/rent",
+      "name": "rentadmin",
+      "pages": [
+        "new_rent_list",
+        "punchcard_products/punchcard_product_detail/punchcard_product_detail",
+        "punchcard_products/punchcard_products",
+        "punchcard_sales/punchcard_sales",
+        "rent_append",
+        "rent_order_detail/rent_order_detail",
+        "rent_report",
+        "search_fuzzy",
+        "settings/category_tree",
+        "settings/rent_package",
+        "settings/rent_package_list",
+        "settings/rent_product",
+        "settings/rent_product_add",
+        "settings/rent_product_list",
+        "unreturned"
       ]
     },
     {
