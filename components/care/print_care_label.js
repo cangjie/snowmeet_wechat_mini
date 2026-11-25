@@ -344,6 +344,8 @@ Component({
     },
     print(e) {
       var that = this
+      // 这一次打印有没有哪一包写失败：全部发完且没失败，才通知页面「打印成功」（见 notifyPrinted）
+      that._sendFailed = false
       var buff = null
       if (that.data.printType == '顾客小票') {
         buff = that.getCommand('【客户联】')
@@ -413,6 +415,7 @@ Component({
           }
         },
         fail: function (e) {
+          that._sendFailed = true
           wx.showToast({
             title: '打印第' + currentPrint + '张失败',
             icon: 'none',
@@ -440,6 +443,9 @@ Component({
                 currentPrint: 1,
                 readyForPrint: true
               })
+              if (!that._sendFailed) {
+                that.notifyPrinted()
+              }
             } else {
               currentPrint++
               that.setData({
@@ -450,6 +456,17 @@ Component({
             }
           }
         }
+      })
+    },
+    // 全部数据发完（含包 / 含杖的两张存根都发完）且没有哪一包失败：告诉页面打印成功了。
+    // 详情页据此清掉「改过修刃角度、标签还没重打」的状态；degree 是这次印在标签上的角度（和 getCommand 同口径，空按 89）
+    notifyPrinted() {
+      var that = this
+      var care = that.properties.care || {}
+      that.triggerEvent('printed', {
+        type: that.data.printType == '顾客小票' ? '顾客小票' : '标签存根',
+        careId: care.id,
+        degree: care.edge_degree == null ? '89' : String(care.edge_degree).trim()
       })
     },
     printCustLabel(e) {

@@ -10,6 +10,7 @@ const util = require('../../../../utils/util.js');
 const data = require('../../../../utils/data.js');
 const repairMedia = require('../../../../utils/care_repair_media.js');
 const careOrderRows = require('../../../../utils/care_order_rows.js');
+const edgeLabel = require('../../../../utils/care_edge_label.js');
 
 // 与 data.js uploadFilePromise 的上传域名保持一致（照片落在处理上传那台服务器的磁盘）
 const IMG_HOST = data.IMAGE_HOST;
@@ -356,6 +357,10 @@ Page({
     const myStaffId = (app.globalData.staff || {}).id;
     const now = Date.now();
     let currentFound = false;
+    // 修刃角度：修刃开始之前都能改；改了要重新打印标签存根（服务器记在 care.label_edge_degree），没重打不能开始修刃
+    const edgeTaskRaw = (care.tasks || []).find((t) => t && t.task_name === edgeLabel.EDGE_TASK_NAME && t.valid !== 0);
+    care._edgeEditable = edgeLabel.whyCannotEdit(care, edgeTaskRaw) === null;
+    care._edgeLabelPending = !!edgeTaskRaw && edgeTaskRaw.status === '未开始' && edgeLabel.isPending(care);
     const orderedTasks = sortCareTasks(care.tasks);
     care.tasks = orderedTasks;
     care._tasks = orderedTasks.map((t) => {
@@ -396,6 +401,11 @@ Page({
             task._hint = '结束维修前，请先在下面上传维修后的照片或视频';
           }
         }
+      }
+      // 角度改过、标签没重打：这一道「开始」置灰，说明原因
+      task._startBlocked = t.task_name === edgeLabel.EDGE_TASK_NAME && t.status === '未开始' && care._edgeLabelPending;
+      if (task._startBlocked && task._current) {
+        task._hint = edgeLabel.startBlockedMessage(care);
       }
       switch (t.task_name) {
         case '修刃': task._title = '修刃 角度：' + (care.edge_degree || '89'); break;
@@ -1008,6 +1018,14 @@ Page({
       wx.showToast({ title: '请填写后点确认安全', icon: 'none' });
       return;
     }
+    // 修刃：角度改过、标签存根还没重新打印，不能开始（后端也拦，这里提前说明）
+    if (taskName === edgeLabel.EDGE_TASK_NAME) {
+      const edgeCare = this.data.cares[this._careIdx(e)];
+      if (edgeLabel.startBlockedMessage(edgeCare)) {
+        wx.showToast({ title: '修刃角度改过了，请先重新打印标签存根', icon: 'none', duration: 2500 });
+        return;
+      }
+    }
     // 维修：开始前必须已上传维修前的照片或视频
     if (taskName === '维修') {
       const startCare = this.data.cares[this._careIdx(e)];
@@ -1024,6 +1042,44 @@ Page({
         if (!res.confirm) return;
         data.updateCareTaskStatusPromise(taskId, '已开始', '养护详情页', app.globalData.sessionKey, null, null)
           .then(() => { that.loadOrder(); }).catch(() => {});
+      },
+    });
+  },
+
+  /* ---------- 修改修刃角度（修刃开始之前；改了要重新打印标签存根） ---------- */
+  onEditEdgeDegree(e) {
+    const that = this;
+    const care = this.data.cares[this._careIdx(e)];
+    if (!care) return;
+    const edgeTask = (care._tasks || []).find((t) => t.task_name === edgeLabel.EDGE_TASK_NAME && t.valid !== 0);
+    const why = edgeLabel.whyCannotEdit(care, edgeTask);
+    if (why) {
+      wx.showToast({ title: why, icon: 'none', duration: 2500 });
+      return;
+    }
+    const current = edgeLabel.printedDegree(care.edge_degree);
+    wx.showModal({
+      title: '修改修刃角度',
+      content: current,
+      editable: true,
+      placeholderText: '0～90，可带一位小数',
+      success(res) {
+        if (!res.confirm) return;
+        const parsed = edgeLabel.parseAngle(res.content);
+        if (!parsed.ok) {
+          wx.showToast({ title: parsed.error, icon: 'none', duration: 2500 });
+          return;
+        }
+        if (parsed.value === current) return;
+        data.setCareEdgeDegreePromise(care.id, parsed.value, app.globalData.sessionKey)
+          .then((newCare) => {
+            that.loadOrder();
+            if (edgeLabel.isPending(newCare)) {
+              wx.showToast({ title: '角度已改为 ' + parsed.value + '°，请重新打印标签存根', icon: 'none', duration: 3000 });
+            }
+          })
+          // 服务器拒绝（比如别人刚开始了修刃）：接口层已提示原因，这里刷新让页面和服务器对齐
+          .catch(() => { that.loadOrder(); });
       },
     });
   },
@@ -1633,6 +1689,19 @@ Page({
   onPrintInvoice(e) {
     const care = this._preparePrint(this._careIdx(e));
     this.setData({ printShow: true, printType: 'invoice', careToBePrinted: care });
+  },
+
+  // 打印组件（print-care）数据全部发完且没失败时发 printed：标签存根打完 → 清掉「角度改过、标签没重打」的状态
+  onLabelPrinted(e) {
+    const that = this;
+    const detail = (e && e.detail) || {};
+    if (detail.type !== '标签存根') return;
+    const care = (this.data.cares || []).find((c) => c.id === detail.careId);
+    if (!care || !care._edgeLabelPending) return;
+    data.markCareEdgeLabelPrintedPromise(care.id, detail.degree, app.globalData.sessionKey)
+      .then(() => { that.loadOrder(); })
+      // 服务器说打印的角度和当前对不上（打印期间又被改了）：状态保留，刷新后继续提示重打
+      .catch(() => { that.loadOrder(); });
   },
 
   onPrinterClose() {

@@ -1012,6 +1012,20 @@ const updateCareTaskStatusPromise = function (taskId, status, scene, sessionKey,
     })
   })
 }
+// 修改修刃角度（修刃开始之前才能改）：服务器记下「标签上印的是改之前的角度」，重新打印标签前不让开始修刃
+const setCareEdgeDegreePromise = function (careId, degree, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Care/SetEdgeDegree?careId=' + careId
+    + '&degree=' + encodeURIComponent(degree) + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
+// 标签存根重新打印成功后调用：清掉「角度改过、标签没重打」的状态；degree 是这次印在标签上的角度（和当前对不上服务器不认）
+const markCareEdgeLabelPrintedPromise = function (careId, degree, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Care/MarkEdgeLabelPrinted?careId=' + careId + '&sessionKey=' + sessionKey
+  if (degree != null && degree !== '') {
+    url += '&degree=' + encodeURIComponent(degree)
+  }
+  return util.performWebRequest(url, undefined)
+}
 /* ---------- 养护详情页：发板核销 / 品牌 / 扫码取板（2026-07-12 从旧页内联接口收口） ---------- */
 // 发送取板码（公众号模板消息发给会员）
 const createCareVerifyCodePromise = function (careId, sessionKey) {
@@ -2202,6 +2216,8 @@ module.exports = {
   updateRentalGuarantyPromise,
   updateCarePromise,
   updateCareTaskStatusPromise,
+  setCareEdgeDegreePromise,
+  markCareEdgeLabelPrintedPromise,
   createCareVerifyCodePromise,
   veriCareFinishCodePromise,
   setCarePickImagePromise,

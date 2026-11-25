@@ -324,6 +324,20 @@
 }
 .btn--print-receipt { background: #00476b; box-shadow: 0 6rpx 16rpx rgba(0, 71, 107, 0.35); }
 .btn--print:active { opacity: 0.85; }
+/* 修刃角度改过、标签存根还没重新打印：这个按钮变橙色，提醒先重打（用户 2026-11-25 要求） */
+.btn--print-attn { background: #d97706; box-shadow: 0 6rpx 16rpx rgba(217, 119, 6, 0.4); }
+
+/* 修刃任务旁的「改角度」（修刃开始之前才有） */
+.edge-edit {
+  margin-left: 16rpx;
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #006495;
+  color: #006495;
+  font-size: 24rpx;
+  line-height: 1.4;
+}
+.edge-edit:active { opacity: 0.6; }
 
 /* 发板核销 */
 .deal-method-row, .veri-row {

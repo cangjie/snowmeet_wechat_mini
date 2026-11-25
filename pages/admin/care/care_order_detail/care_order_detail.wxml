@@ -306,7 +306,7 @@
 
         <!-- 打印：放在装备信息之后、养护任务之前 -->
         <view class="panel-btn-row panel-btn-row--split">
-          <view class="btn btn--primary btn--print" data-cidx="{{cidx}}" catchtap="onPrintLabel">打印标签存根</view>
+          <view class="btn btn--primary btn--print {{care._edgeLabelPending ? 'btn--print-attn' : ''}}" data-cidx="{{cidx}}" catchtap="onPrintLabel">{{care._edgeLabelPending ? '重新打印标签存根' : '打印标签存根'}}</view>
           <view class="btn btn--primary btn--print btn--print-receipt" data-cidx="{{cidx}}" catchtap="onPrintInvoice">打印顾客小票</view>
         </view>
 
@@ -330,6 +330,8 @@
                 <view class="task-name-wrap">
                   <text class="task-name">{{task._title}}</text>
                   <view class="chip {{task.status === '已开始' ? 'chip-primary' : 'chip-muted'}}">{{task.status}}</view>
+                  <view wx:if="{{task.task_name === '修刃' && care._edgeEditable}}" class="edge-edit"
+                        data-cidx="{{cidx}}" catchtap="onEditEdgeDegree">改角度</view>
                 </view>
                 <view class="task-meta" wx:if="{{task._staffName || task._startStr}}">
                   <text wx:if="{{task._staffName}}">{{task._staffName}}</text>
@@ -342,7 +344,7 @@
                 </view>
                 <!-- 通用任务整宽大按钮（安全检查/发板/寄存或快递走各自专属面板） -->
                 <block wx:if="{{task._current && task.task_name !== '安全检查' && task.task_name !== '发板' && task.task_name !== '寄存或快递'}}">
-                  <view wx:if="{{task.status === '未开始'}}" class="btn btn--primary btn--block"
+                  <view wx:if="{{task.status === '未开始'}}" class="btn btn--primary btn--block {{task._startBlocked ? 'btn--disabled' : ''}}"
                         data-cidx="{{cidx}}" data-task-id="{{task.id}}" data-task-name="{{task.task_name}}" catchtap="onTaskStart">开始 {{task.task_name}}</view>
                   <view wx:elif="{{task._running && task._isMine}}" class="btn btn--danger btn--block"
                         data-cidx="{{cidx}}" data-task-id="{{task.id}}" catchtap="onTaskEnd">结束 {{task.task_name}}</view>
@@ -547,7 +549,7 @@
   <view style="height: 120rpx;"></view>
 
   <van-popup show="{{ printShow }}" position="bottom" custom-style="height: 80%;" bind:close="onPrinterClose" closeable>
-    <print-care wx:if="{{printShow}}" care="{{careToBePrinted}}" order="{{order}}" type="{{printType}}"></print-care>
+    <print-care wx:if="{{printShow}}" care="{{careToBePrinted}}" order="{{order}}" type="{{printType}}" bind:printed="onLabelPrinted"></print-care>
   </van-popup>
 
   <!-- 新增品牌 -->
