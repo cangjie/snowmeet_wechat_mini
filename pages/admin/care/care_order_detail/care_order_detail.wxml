@@ -320,6 +320,8 @@
               <van-icon name="{{task.status === '已完成' ? 'checked' : 'clear'}}" size="16px"
                         color="{{task.status === '已完成' ? '#15803d' : '#b91c1c'}}"/>
               <text class="task-done-name">{{task._title}}</text>
+              <text wx:if="{{task.task_name === '修刃'}}" class="edge-log-link"
+                    data-cidx="{{cidx}}" catchtap="onShowEdgeHistory">角度记录</text>
               <text wx:if="{{task.status === '强行中止'}}" class="task-done-flag">中止</text>
               <text class="task-done-meta">{{task._durationStr ? task._durationStr + ' · ' : ''}}{{task._staffName ? task._staffName + ' · ' : ''}}{{task._endStr}}</text>
             </view>
@@ -332,6 +334,8 @@
                   <view class="chip {{task.status === '已开始' ? 'chip-primary' : 'chip-muted'}}">{{task.status}}</view>
                   <view wx:if="{{task.task_name === '修刃' && care._edgeEditable}}" class="edge-edit"
                         data-cidx="{{cidx}}" catchtap="onEditEdgeDegree">改角度</view>
+                  <text wx:if="{{task.task_name === '修刃'}}" class="edge-log-link"
+                        data-cidx="{{cidx}}" catchtap="onShowEdgeHistory">角度记录</text>
                 </view>
                 <view class="task-meta" wx:if="{{task._staffName || task._startStr}}">
                   <text wx:if="{{task._staffName}}">{{task._staffName}}</text>
@@ -550,6 +554,27 @@
 
   <van-popup show="{{ printShow }}" position="bottom" custom-style="height: 80%;" bind:close="onPrinterClose" closeable>
     <print-care wx:if="{{printShow}}" care="{{careToBePrinted}}" order="{{order}}" type="{{printType}}" bind:printed="onLabelPrinted"></print-care>
+  </van-popup>
+
+  <!-- 修刃角度的修改历史：改过几次、谁什么时候从几度改成几度、重新打印过几次标签存根（新的在前） -->
+  <van-popup show="{{edgeHistory.show}}" position="bottom" round custom-style="max-height: 80%;" bind:close="onCloseEdgeHistory" closeable>
+    <view class="edge-log-modal">
+      <view class="edge-log-title">修刃角度记录</view>
+      <view class="edge-log-sub">{{edgeHistory.careTitle}} · 当前 {{edgeHistory.current}}°</view>
+      <view wx:if="{{edgeHistory.pendingNote}}" class="edge-log-pending">{{edgeHistory.pendingNote}}</view>
+      <view wx:if="{{edgeHistory.loading}}" class="edge-log-empty">加载中...</view>
+      <view wx:elif="{{edgeHistory.failed}}" class="edge-log-empty">记录加载失败，请关掉重新打开</view>
+      <view wx:elif="{{edgeHistory.rows.length === 0}}" class="edge-log-empty">还没有修改记录</view>
+      <scroll-view wx:else scroll-y class="edge-log-list">
+        <view wx:for="{{edgeHistory.rows}}" wx:for-item="row" wx:key="index" class="edge-log-row edge-log-row--{{row.kind}}">
+          <view class="edge-log-main">
+            <text class="edge-log-row-title">{{row.title}}</text>
+            <text class="edge-log-row-detail">{{row.detail}}</text>
+          </view>
+          <view class="edge-log-meta">{{row.staffName}} · {{row.timeStr}}</view>
+        </view>
+      </scroll-view>
+    </view>
   </van-popup>
 
   <!-- 新增品牌 -->

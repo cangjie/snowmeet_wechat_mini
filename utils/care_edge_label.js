@@ -50,11 +50,45 @@ function startBlockedMessage(care) {
     + String(care.label_edge_degree).trim() + '°），请先重新打印标签存根，再开始修刃'
 }
 
+// 「角度记录」弹窗里的一行（后端 Care/GetEdgeHistory 的一项）：
+//   · angle = 改角度，显示「89° → 88°」；
+//   · print = 重新打印标签存根，显示这次打在标签上的角度。
+// 角度缺失按 89（标签上印的就是 89）；不认识的类型返回 null（后端以后加了新类型，旧小程序不显示乱行）
+function historyRow(item) {
+  if (!item) return null
+  if (item.kind === 'angle') {
+    return { kind: 'angle', title: '改角度', detail: historyDegree(item.from) + '° → ' + historyDegree(item.to) + '°' }
+  }
+  if (item.kind === 'print') {
+    return { kind: 'print', title: '重新打印标签存根', detail: '标签上是 ' + historyDegree(item.to) + '°' }
+  }
+  return null
+}
+
+// 记录里的角度：空、空白、字符串 "null" 都按 89
+function historyDegree(value) {
+  const text = value == null ? '' : String(value).trim()
+  return text === '' || text === 'null' ? DEFAULT_DEGREE : text
+}
+
+// 一整份记录转成显示用的行，保持服务器给的顺序（新的在前）；不是数组按空处理
+function historyRows(list) {
+  if (!Array.isArray(list)) return []
+  const rows = []
+  list.forEach((item) => {
+    const row = historyRow(item)
+    if (row) rows.push(Object.assign(row, { source: item }))
+  })
+  return rows
+}
+
 module.exports = {
   EDGE_TASK_NAME,
   printedDegree,
   isPending,
   parseAngle,
   whyCannotEdit,
-  startBlockedMessage
+  startBlockedMessage,
+  historyRow,
+  historyRows
 }

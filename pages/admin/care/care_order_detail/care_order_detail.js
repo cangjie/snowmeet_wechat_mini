@@ -72,6 +72,8 @@ Page({
     scanQr: { careId: 0, url: '', status: '' }, // status: loading / ready / scanned（顾客已扫码、在授权手机号） / broken
     addBrand: { show: false, cidx: -1, name: '', chineseName: '' },
     cancelModal: { show: false, cidx: -1 },
+    // 修刃角度的修改历史弹窗（用户 2026-11-25 要求）
+    edgeHistory: { show: false, loading: false, failed: false, careTitle: '', current: '', pendingNote: '', rows: [] },
     skiBrandList: [],
     boardBrandList: [],
     printShow: false,
@@ -1086,6 +1088,54 @@ Page({
           .catch(() => { that.loadOrder(); });
       },
     });
+  },
+
+  /* ---------- 修刃角度的修改历史：改过几次、谁什么时候从几度改成几度、重新打印过几次 ---------- */
+  onShowEdgeHistory(e) {
+    const that = this;
+    const care = this.data.cares[this._careIdx(e)];
+    if (!care) return;
+    // 每次打开记一个序号：慢响应回来时弹窗已经关了、或已经换成另一件装备，就不能再改弹窗内容
+    const seq = (this._edgeHistorySeq || 0) + 1;
+    this._edgeHistorySeq = seq;
+    this.setData({
+      edgeHistory: {
+        show: true,
+        loading: true,
+        failed: false,
+        careTitle: care._title || '',
+        current: edgeLabel.printedDegree(care.edge_degree),
+        pendingNote: edgeLabel.isPending(care)
+          ? '标签上还是 ' + String(care.label_edge_degree).trim() + '°，需要重新打印标签存根' : '',
+        rows: [],
+      },
+    });
+    data.getCareEdgeHistoryPromise(care.id, app.globalData.sessionKey)
+      .then((list) => {
+        if (that._edgeHistorySeq !== seq) return;
+        const rows = edgeLabel.historyRows(list).map((row) => {
+          const src = row.source;
+          const when = src.time ? new Date(src.time) : null;
+          return {
+            kind: row.kind,
+            title: row.title,
+            detail: row.detail,
+            staffName: src.staffName || '',
+            timeStr: when && !isNaN(when.valueOf()) ? util.formatDate(when) + ' ' + that._timeStr(when) : '',
+          };
+        });
+        that.setData({ 'edgeHistory.loading': false, 'edgeHistory.failed': false, 'edgeHistory.rows': rows });
+      })
+      // 失败原因（没权限、断网）接口层已经提示过，这里只把弹窗从「加载中」放出来
+      .catch(() => {
+        if (that._edgeHistorySeq !== seq) return;
+        that.setData({ 'edgeHistory.loading': false, 'edgeHistory.failed': true });
+      });
+  },
+
+  onCloseEdgeHistory() {
+    this._edgeHistorySeq = (this._edgeHistorySeq || 0) + 1;
+    this.setData({ 'edgeHistory.show': false });
   },
 
   onTaskEnd(e) {

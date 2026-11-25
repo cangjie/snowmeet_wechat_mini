@@ -339,6 +339,43 @@
 }
 .edge-edit:active { opacity: 0.6; }
 
+/* 修刃任务旁的「角度记录」（看改过几次、谁改的） */
+.edge-log-link {
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  line-height: 1.4;
+  color: #006495;
+  text-decoration: underline;
+  flex: none;
+}
+.edge-log-link:active { opacity: 0.6; }
+.edge-log-modal { padding: 32rpx 24rpx 48rpx; }
+.edge-log-title { font-size: 30rpx; font-weight: 600; color: #1f2a33; text-align: center; }
+.edge-log-sub { font-size: 24rpx; color: #6f7881; text-align: center; margin-top: 6rpx; margin-bottom: 20rpx; }
+.edge-log-pending {
+  margin-bottom: 16rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 12rpx;
+  background: #fffbeb;
+  color: #b45309;
+  font-size: 24rpx;
+}
+.edge-log-empty { padding: 48rpx 0; text-align: center; font-size: 26rpx; color: #9aa3ac; }
+.edge-log-list { max-height: 60vh; }
+.edge-log-row {
+  padding: 18rpx 0 18rpx 20rpx;
+  border-left: 6rpx solid #006495;
+  margin-bottom: 14rpx;
+  background: #f6f9fb;
+  border-radius: 0 12rpx 12rpx 0;
+}
+.edge-log-row--print { border-left-color: #d97706; }
+.edge-log-main { display: flex; flex-direction: row; align-items: baseline; justify-content: space-between; padding-right: 20rpx; }
+.edge-log-row-title { font-size: 28rpx; color: #1f2a33; font-weight: 600; }
+.edge-log-row-detail { font-size: 28rpx; color: #006495; font-weight: 600; }
+.edge-log-row--print .edge-log-row-detail { color: #b45309; }
+.edge-log-meta { margin-top: 6rpx; font-size: 22rpx; color: #9aa3ac; }
+
 /* 发板核销 */
 .deal-method-row, .veri-row {
   display: flex;

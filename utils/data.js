@@ -1026,6 +1026,11 @@ const markCareEdgeLabelPrintedPromise = function (careId, degree, sessionKey) {
   }
   return util.performWebRequest(url, undefined)
 }
+// 修刃角度的修改历史：改过几次、谁什么时候从几度改成几度、重新打印过几次标签存根（新的在前；职级 >= 100 的员工可看）
+const getCareEdgeHistoryPromise = function (careId, sessionKey) {
+  var url = app.globalData.requestPrefix + 'Care/GetEdgeHistory?careId=' + careId + '&sessionKey=' + sessionKey
+  return util.performWebRequest(url, undefined)
+}
 /* ---------- 养护详情页：发板核销 / 品牌 / 扫码取板（2026-07-12 从旧页内联接口收口） ---------- */
 // 发送取板码（公众号模板消息发给会员）
 const createCareVerifyCodePromise = function (careId, sessionKey) {
@@ -2218,6 +2223,7 @@ module.exports = {
   updateCareTaskStatusPromise,
   setCareEdgeDegreePromise,
   markCareEdgeLabelPrintedPromise,
+  getCareEdgeHistoryPromise,
   createCareVerifyCodePromise,
   veriCareFinishCodePromise,
   setCarePickImagePromise,
