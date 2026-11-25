@@ -12,6 +12,10 @@ const repairMedia = require('../../../../utils/care_repair_media.js');
 const careOrderRows = require('../../../../utils/care_order_rows.js');
 const edgeLabel = require('../../../../utils/care_edge_label.js');
 
+// 临时（用户 2026-11-25）：手头没有打印机没法测试，点「重新打印标签存根」按钮就算重新打印了（清掉「角度改过、标签没重打」）。
+// 有打印机后改成 false：状态只在 print-care 发出 printed（标签真的打完）时才清，见 onLabelPrinted。
+const MARK_PRINTED_ON_TAP = true;
+
 // 与 data.js uploadFilePromise 的上传域名保持一致（照片落在处理上传那台服务器的磁盘）
 const IMG_HOST = data.IMAGE_HOST;
 
@@ -1684,6 +1688,9 @@ Page({
   onPrintLabel(e) {
     const care = this._preparePrint(this._careIdx(e));
     this.setData({ printShow: true, printType: 'label', careToBePrinted: care });
+    if (MARK_PRINTED_ON_TAP && care._edgeLabelPending) {
+      this._markEdgeLabelPrinted(care, edgeLabel.printedDegree(care.edge_degree));
+    }
   },
 
   onPrintInvoice(e) {
@@ -1693,14 +1700,19 @@ Page({
 
   // 打印组件（print-care）数据全部发完且没失败时发 printed：标签存根打完 → 清掉「角度改过、标签没重打」的状态
   onLabelPrinted(e) {
-    const that = this;
     const detail = (e && e.detail) || {};
     if (detail.type !== '标签存根') return;
     const care = (this.data.cares || []).find((c) => c.id === detail.careId);
     if (!care || !care._edgeLabelPending) return;
-    data.markCareEdgeLabelPrintedPromise(care.id, detail.degree, app.globalData.sessionKey)
+    this._markEdgeLabelPrinted(care, detail.degree);
+  },
+
+  // 告诉服务器「标签已重新打印，印的是 degree」，清掉待重打状态后刷新订单；
+  // 服务器说角度对不上（打印期间又被改了）时状态保留，刷新后继续提示重打
+  _markEdgeLabelPrinted(care, degree) {
+    const that = this;
+    data.markCareEdgeLabelPrintedPromise(care.id, degree, app.globalData.sessionKey)
       .then(() => { that.loadOrder(); })
-      // 服务器说打印的角度和当前对不上（打印期间又被改了）：状态保留，刷新后继续提示重打
       .catch(() => { that.loadOrder(); });
   },
 

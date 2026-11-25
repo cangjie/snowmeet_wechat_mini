@@ -286,6 +286,53 @@ test('标签打完：服务器说打印的角度和当前对不上 → 刷新订
   done()
 })
 
+// ---------------- 临时：没有打印机没法测试，点「重新打印标签存根」按钮就算重新打印了（用户 2026-11-25） ----------------
+// 有打印机后：把页面里的 MARK_PRINTED_ON_TAP 改成 false（或删掉），这几项测试改成「点按钮不清状态」，
+// 状态只在 print-care 发出 printed（标签真的打完）时清，见上面「标签打完」几项。
+test('临时：待重打时点「重新打印标签存根」→ 立刻带当前角度调接口清状态、刷新订单；打印弹窗照常打开', async () => {
+  const { page, calls, done } = detail()
+  withCare(page, render(page, { edge_degree: '87', label_edge_degree: '89', edgeLabelPending: true }))
+  page.onPrintLabel(tap({ cidx: 0 }))
+  await settle()
+  assert.deepEqual(calls.marked, [[7, '87', 'sk']])
+  assert.equal(calls.loads, 1)
+  assert.equal(page.data.printShow, true)
+  assert.equal(page.data.printType, 'label')
+  done()
+})
+
+test('临时：edge_degree 为空（标签印 89）时带 89', async () => {
+  const { page, calls, done } = detail()
+  withCare(page, render(page, { edge_degree: null, label_edge_degree: '88', edgeLabelPending: true }))
+  page.onPrintLabel(tap({ cidx: 0 }))
+  await settle()
+  assert.deepEqual(calls.marked, [[7, '89', 'sk']])
+  done()
+})
+
+test('临时：不待重打时点「打印标签存根」、或点「打印顾客小票」→ 不调接口', async () => {
+  const { page, calls, done } = detail()
+  withCare(page, render(page, { edge_degree: '87' }))
+  page.onPrintLabel(tap({ cidx: 0 }))
+  withCare(page, render(page, { edge_degree: '87', label_edge_degree: '89', edgeLabelPending: true }))
+  page.onPrintInvoice(tap({ cidx: 0 }))
+  await settle()
+  assert.deepEqual(calls.marked, [])
+  assert.equal(calls.loads, 0)
+  assert.equal(page.data.printShow, true)
+  done()
+})
+
+test('临时：服务器拒绝清状态 → 也刷新订单，页面和服务器对齐', async () => {
+  const { page, calls, done } = detail({ markFails: true })
+  withCare(page, render(page, { edge_degree: '87', label_edge_degree: '89', edgeLabelPending: true }))
+  page.onPrintLabel(tap({ cidx: 0 }))
+  await settle()
+  assert.equal(calls.marked.length, 1)
+  assert.equal(calls.loads, 1)
+  done()
+})
+
 // ---------------- 打印组件：标签真正打完才发 printed ----------------
 function printer(t, careExtra, options = {}) {
   const previousApp = global.getApp
@@ -366,9 +413,13 @@ test('模板：只有修刃任务（未完成的那一行）旁有「改角度�
   assert.equal((wxml.match(/onEditEdgeDegree/g) || []).length, 1)
 })
 
-test('模板：「开始」按钮在待重打时置灰（btn--disabled）；打印标签的按钮待重打时改成「重新打印标签存根」', () => {
+test('模板：「开始」按钮在待重打时置灰（btn--disabled）；打印标签的按钮待重打时改成「重打标签存根」', () => {
   assert.match(wxml, /class="btn btn--primary btn--block \{\{task\._startBlocked \? 'btn--disabled' : ''\}\}"/)
-  assert.match(wxml, /\{\{care\._edgeLabelPending \? '重新打印标签存根' : '打印标签存根'\}\}/)
+  const m = wxml.match(/\{\{care\._edgeLabelPending \? '([^']+)' : '([^']+)'\}\}/)
+  assert.ok(m, '标签按钮文字随待重打切换')
+  assert.deepEqual([m[1], m[2]], ['重打标签存根', '打印标签存根'])
+  // 按钮只有半行宽，超过 6 个字会折成两行（截图里「重新打印标签存根」的「根」字掉到第二行）
+  assert.ok(m[1].length <= 6 && m[2].length <= 6, '按钮文字不超过 6 个字')
   assert.match(wxml, /btn--print \{\{care\._edgeLabelPending \? 'btn--print-attn' : ''\}\}/)
 })
 
