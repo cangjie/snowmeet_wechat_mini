@@ -283,7 +283,7 @@ Page({
             }).catch(function () { order.punchCardInfo = emptyPunch })
           : Promise.resolve(order.punchCardInfo = emptyPunch)
         var benefitP = order.member_id
-          ? data.getRentalBenefitQuotePromise(order.id, sessionKey, false).then(function (q) {
+          ? that.loadBenefitQuote(order).then(function (q) {
               order.benefitQuote = q
               order._benefitLoadFailed = false
             }).catch(function () { order.benefitQuote = null; order._benefitLoadFailed = true })
@@ -291,6 +291,19 @@ Page({
         Promise.all([memberP, punchP, benefitP]).then(function () { finish() })
       }).catch(function () { wx.hideLoading() })
     }).catch(function () { wx.hideLoading() })
+  },
+
+  // 加载租赁优惠报价。2026-11-25 用户定：自动匹配没匹配上任何券或卡，就关闭自动匹配（把模式设为 none，再取关闭之后的报价）。
+  // 模式留在 auto 会把本单当成「自动核销中」：藏起「推荐次卡」，服务端也拒绝购买次卡（「请先关闭自动匹配」）。
+  // 关闭失败就保留原报价，下次加载再试，不影响页面。
+  loadBenefitQuote(order) {
+    var sessionKey = app.globalData.sessionKey
+    return data.getRentalBenefitQuotePromise(order.id, sessionKey, false).then(function (q) {
+      if (!rentBenefit.shouldCloseAuto(q)) return q
+      return data.setRentalBenefitModePromise(order.id, 'none', sessionKey).then(function () {
+        return data.getRentalBenefitQuotePromise(order.id, sessionKey, false)
+      }, function () { return q })
+    })
   },
 
   renderOrder(order) {
