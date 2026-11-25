@@ -73,7 +73,7 @@
 
               <!-- 照片 -->
               <view class="form-group">
-                <view class="form-label">装备照片</view>
+                <view class="form-label">装备照片<text class="photo-required"> *必填</text></view>
                 <van-uploader
                   file-list="{{care.careImages}}"
                   capture="{{['album', 'camera']}}"

@@ -6,11 +6,12 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { loadComponent, loadPage, settle, tap } = require('./reception_harness');
+const PHOTO = [{ id: 0, care_id: 0, image_id: 9, status: 'success', url: 'https://img.test/a.jpg', thumb: 'https://img.test/a_t.jpg' }] // 装备照片必填：每件装备都带一张已传好的照片
 
 const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
 
 function care(id = 1, patch = {}) {
-  return { id, equipment: '双板', brand: '测试', scale: '170', need_edge: 0, edge_degree: null,
+  return { id, equipment: '双板', brand: '测试', scale: '170', careImages: PHOTO, need_edge: 0, edge_degree: null,
     need_wax: 0, need_unwax: 0, seal_board: 0, free_wax: 0, summer: null, use_card: false, card_id: null,
     ticket_code: null, common_charge: 0, repair_charge: 0, discount: 0, ...patch };
 }

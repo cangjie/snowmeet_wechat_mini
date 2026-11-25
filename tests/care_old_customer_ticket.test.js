@@ -1,12 +1,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { loadComponent, settle } = require('./reception_harness');
+const PHOTO = [{ id: 0, care_id: 0, image_id: 9, status: 'success', url: 'https://img.test/a.jpg', thumb: 'https://img.test/a_t.jpg' }] // 装备照片必填：每件装备都带一张已传好的照片
 
 function ticket(code, expiry, memberId = 10) {
   return { code, template_id: 16, name: '老顾客优惠券', member_id: memberId, expire_date: expiry };
 }
 function care(id, patch) {
-  return { id, equipment: '双板', brand: '测试', scale: '170', need_edge: 1, need_wax: 1,
+  return { id, equipment: '双板', brand: '测试', scale: '170', careImages: PHOTO, need_edge: 1, need_wax: 1,
     need_unwax: 1, edge_degree: '89', discount: 0, ...patch };
 }
 function punch(id, patch) {

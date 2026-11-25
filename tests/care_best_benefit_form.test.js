@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { loadComponent, settle, tap } = require('./reception_harness');
+const PHOTO = [{ id: 0, care_id: 0, image_id: 9, status: 'success', url: 'https://img.test/a.jpg', thumb: 'https://img.test/a_t.jpg' }] // 装备照片必填：每件装备都带一张已传好的照片
 
 function setup(t, options = {}) {
   const oldApp = global.getApp, oldWx = global.wx;
@@ -28,7 +29,7 @@ function setup(t, options = {}) {
     },
   });
   Object.assign(form.data, { memberId: 10, shop: '测试店', cares: options.cares || [{
-    id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 0, need_wax: 0,
+    id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 0, need_wax: 0,
     need_unwax: 0, free_wax: 0, discount: 0, repair_charge: 0,
   }] });
   form._refreshCares();
@@ -58,7 +59,7 @@ test('先等待服务端项目联动完成，再按最终项目试算所有券�
   let release;
   const gate = new Promise(r => { release = r; });
   const { form, calls } = setup(t, { tickets: [ticket('FREE', 12)], cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_wax: 1, need_unwax: 1, free_wax: 0, discount: 0 },
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_wax: 1, need_unwax: 1, free_wax: 0, discount: 0 },
   ], calculate: async req => {
     const c = { ...req.care };
     if (req.changedField === 'free_wax') { await gate; c.need_wax = c.need_unwax = 0; }
@@ -77,7 +78,7 @@ test('先等待服务端项目联动完成，再按最终项目试算所有券�
 
 test('店员手选券卡或不使用时保留已经选好的养护项目', async t => {
   const { form } = setup(t, { cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, need_wax: 1, need_unwax: 1,
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, need_wax: 1, need_unwax: 1,
       edge_degree: '89', discount: 0 },
   ] });
   await settle();
@@ -91,7 +92,7 @@ test('店员手选券卡或不使用时保留已经选好的养护项目', async
 
 test('学员卡参加真实比价；没有优惠的券不会自动核销', async t => {
   const { form } = setup(t, { tickets: [ticket('OTHER')], coaches: [{ cardId: 3, coachName: '教练' }],
-    cares: [{ id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, discount: 0 }] });
+    cares: [{ id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, discount: 0 }] });
   await settle(); await form.waitForPrices();
   assert.equal(form.data.displayCares[0].coach_card_id, 3);
   assert.equal(form.data.displayCares[0].ticket_code, null);
@@ -99,8 +100,8 @@ test('学员卡参加真实比价；没有优惠的券不会自动核销', async
 
 test('多件装备共享一张季卡和一张券时按整单最省分配', async t => {
   const { form } = setup(t, { tickets: [ticket('SAVE')], cards: [card(1, '打蜡季卡', null)], cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, discount: 0 },
-    { id: 2, equipment: '单板', brand: 'B', scale: '150', need_wax: 1, discount: 0 },
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, discount: 0 },
+    { id: 2, equipment: '单板', brand: 'B', scale: '150', careImages: PHOTO, need_wax: 1, discount: 0 },
   ] });
   await settle(); await form.waitForPrices();
   assert.equal(form.data.displayCares[0].ticket_code, 'SAVE');
@@ -109,7 +110,7 @@ test('多件装备共享一张季卡和一张券时按整单最省分配', async
 
 test('去掉已选服务后移除自动权益；点击结算等待比价并同步结果', async t => {
   const { form } = setup(t, { tickets: [ticket('SAVE')], cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, need_repair: 1,
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, need_repair: 1,
       repair_memo: '维修', repair_charge: 20, discount: 0 },
   ] });
   await form.onCheckout();
@@ -122,7 +123,7 @@ test('去掉已选服务后移除自动权益；点击结算等待比价并同�
 
 test('比价失败不能按未经比较的结果结算', async t => {
   const { form } = setup(t, { tickets: [ticket('SAVE')], cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, discount: 0 },
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, discount: 0 },
   ], calculate: req => {
     if (req.care.ticket_code) throw new Error('quote failed');
     return { care: { ...req.care, common_charge: 170 } };
@@ -134,7 +135,7 @@ test('比价失败不能按未经比较的结果结算', async t => {
 test('结算时刷新券卡，券已在别处使用则撤销自动选择', async t => {
   let loads = 0;
   const { form } = setup(t, { getTickets: async () => ++loads === 1 ? [ticket('SAVE')] : [], cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, discount: 0 },
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, discount: 0 },
   ] });
   await settle(); await form.waitForPrices();
   assert.equal(form.data.displayCares[0].ticket_code, 'SAVE');
@@ -145,7 +146,7 @@ test('结算时刷新券卡，券已在别处使用则撤销自动选择', async
 
 test('手动减免叠加季卡会产生负金额时，不自动选择该季卡', async t => {
   const { form } = setup(t, { cards: [card(1, '打蜡季卡', null)], cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_wax: 1, discount: 30 },
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_wax: 1, discount: 30 },
   ] });
   await settle(); await form.waitForPrices();
   assert.equal(form.data.displayCares[0].card_id || null, null);
@@ -165,7 +166,7 @@ test('顾客持有绑定其他装备的打蜡季卡时仍显示按钮，但不�
 test('列表或报价迟到不能覆盖顾客切换或手动选择', async t => {
   let resolveTickets;
   const { form } = setup(t, { getTickets: () => new Promise(r => { resolveTickets = r; }),
-    cares: [{ id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, discount: 0 }] });
+    cares: [{ id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, discount: 0 }] });
   await settle();
   form._applyTicketSelection(0, null, null);
   resolveTickets([ticket('SAVE')]);
@@ -175,7 +176,7 @@ test('列表或报价迟到不能覆盖顾客切换或手动选择', async t => 
 
 test('旧草稿券带出的减免不会转移到无券报价', async t => {
   const { form, calls } = setup(t, { cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, need_wax: 1,
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, need_wax: 1,
       ticket_code: 'SAVE', discount: 30 },
   ] });
   form.onSvcToggle(tap({ cidx: 0, flag: 'need_wax' }));
@@ -187,7 +188,7 @@ test('旧草稿券带出的减免不会转移到无券报价', async t => {
 
 test('旧草稿中高于券优惠的手动减免仍然保留', async t => {
   const { form } = setup(t, { cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, need_wax: 1,
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, need_wax: 1,
       ticket_code: 'SAVE', discount: 50 },
   ] });
   form.onSvcToggle(tap({ cidx: 0, flag: 'need_wax' }));
@@ -200,7 +201,7 @@ test('旧券减免查询返回较晚时不覆盖新输入的手动减免', async
   let release;
   const gate = new Promise(r => { release = r; });
   const { form } = setup(t, { cares: [
-    { id: 1, equipment: '双板', brand: 'A', scale: '170', need_edge: 1, need_wax: 1,
+    { id: 1, equipment: '双板', brand: 'A', scale: '170', careImages: PHOTO, need_edge: 1, need_wax: 1,
       ticket_code: 'SAVE', discount: 30 },
   ], calculate: async req => {
     const c = { ...req.care };

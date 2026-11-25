@@ -23,6 +23,20 @@ function uploadUrl(value) {
   return /^(https?:|wxfile:)/.test(value) ? value : UPLOAD_HOST + value;
 }
 
+// 装备照片（用户 2026-11-25 定：开单必须上传，每件装备至少一张）。
+// 传输中（status=uploading）和失败的不算：上传没完成就放行，之后保存会丢掉这张照片。
+// 其余都算——包括找回中断单时后端只带 image 导航对象、没有 status 的照片。
+function isUploadedPhoto(im) {
+  if (!im || im.status === 'uploading' || im.status === 'failed') return false;
+  return !!(im.image_id > 0 || im.id > 0 || im.image || im.url);
+}
+function hasUploadedPhoto(care) {
+  return !!care && (care.careImages || []).some(isUploadedPhoto);
+}
+function hasUploadingPhoto(care) {
+  return !!care && (care.careImages || []).some((im) => im && im.status === 'uploading');
+}
+
 // 万龙服务中心「只选了刮蜡」：一口价（服务端定价），不选任何券、会员卡、学员卡。
 // 这里只用来决定「要不要自动带老顾客券」；价格、以及已选券卡的清除都以服务端 CalcCareCharge 为准
 // （后端 CarePricingRules.AppliesScrapeOnlyPrice 同一口径：先把万龙体验中心归并到服务中心）。
@@ -244,8 +258,8 @@ Component({
     onAddCard() {
       if (this.data.cardBusy) return;
       const cares = this.data.displayCares || [];
-      if (!cares.length || cares.some(c => !c.equipment || (!(c.careImages || []).length && !(c.brand && c.scale)))) {
-        wx.showToast({ title: '请先完整填写装备信息', icon: 'none' }); return;
+      if (!cares.length || cares.some(c => !c.equipment || !hasUploadedPhoto(c))) {
+        wx.showToast({ title: '请先为每件装备上传照片，并完整填写装备信息', icon: 'none' }); return;
       }
       this.triggerEvent('addCard');
     },
@@ -267,9 +281,8 @@ Component({
     // 完整性校验（对齐旧 util.getCareWellFormMessage）
     evalCare(care) {
       if (!care.equipment) return { ok: false, label: '类型未选' };
-      const hasImage = care.careImages && care.careImages.length > 0;
-      const hasBrandScale = care.brand && care.scale;
-      if (!hasImage && !hasBrandScale) return { ok: false, label: '图片或品牌长度必填' };
+      // 照片必填；品牌、长度不再是照片的替代品（有照片就够，没照片填了品牌长度也不行）
+      if (!hasUploadedPhoto(care)) return { ok: false, label: hasUploadingPhoto(care) ? '照片上传中' : '照片必填' };
       const hasService = care.need_edge === 1 || care.need_wax === 1 || care.maintain_board === 1 || care.free_wax === 1 || care.need_unwax === 1
         || care.need_repair === 1 || !!care.repair_memo
         || care.summer != null || (care.repair_charge && care.repair_charge > 0)

@@ -259,3 +259,6 @@
 }
 /* 单板没有雪杖：置灰、不可点 */
 .extra-chk--disabled { opacity: 0.4; }
+
+/* 装备照片必填标记 */
+.photo-required { color: #a52a25; font-size: 24rpx; font-weight: normal; }
