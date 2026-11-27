@@ -92,6 +92,10 @@ function formatSingleFieldChange(care, origin, field, prevVal, nextVal) {
     const fromScale = normalizeText(prevVal) ? normalizeText(prevVal) + 'cm' : '未填';
     const toScale = normalizeText(nextVal) ? normalizeText(nextVal) + 'cm' : '未填';
     changeLine = '长度：' + fromScale + ' → ' + toScale;
+  } else if (field === 'serials') {
+    const fromSerial = formatSerialsDisplay(prevVal) || '未填';
+    const toSerial = formatSerialsDisplay(nextVal) || '未填';
+    changeLine = '序列号：' + fromSerial + ' → ' + toSerial;
   } else {
     changeLine = normalizeText(field) + '：' + (normalizeText(prevVal) || '未填') + ' → ' + (normalizeText(nextVal) || '未填');
   }
@@ -100,6 +104,18 @@ function formatSingleFieldChange(care, origin, field, prevVal, nextVal) {
     equipSummary: summaryParts.join(' · '),
     changeLine,
   };
+}
+
+function formatModifiedBannerText(changes) {
+  if (!changes || changes.length === 0) return '';
+  const labels = [];
+  changes.forEach((ch) => {
+    if (ch && ch.label && labels.indexOf(ch.label) < 0) {
+      labels.push(ch.label);
+    }
+  });
+  if (labels.length === 0) return '';
+  return '已修改' + labels.join('、') + '，下单时将更新原装备';
 }
 
 // 检测一件已关联会员装备（member_equipment_id > 0 且有原始快照 origin）的 care 是否被修改了字段
@@ -200,4 +216,5 @@ module.exports = {
   collectModifiedEquipments,
   formatConfirmContent,
   formatSingleFieldChange,
+  formatModifiedBannerText,
 };

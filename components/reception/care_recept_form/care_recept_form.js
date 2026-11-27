@@ -227,8 +227,8 @@ Component({
     // 会员装备选择弹层：会员选定装备类型后，从其名下装备列表读取同类型装备供选择；
     // 也可在弹层里填写新装备（下单提交时自动加入该会员装备列表）
     historyModal: { show: false, cidx: -1, equip: '', list: [], brandListView: [], brandIndex: null, brand: '', scale: '', serials: '' },
-    // 已选旧装备修改品牌/长度后的立即确认弹窗（更新旧装备 vs 另存为新装备）
-    equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
+    // 已选旧装备修改品牌/长度/序列号后的立即确认弹窗（另存为新装备 vs 更新旧装备）
+    equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', prevDiffSerial: false, equipSummary: '', changeLine: '' },
     expandedMap: {},
   },
   observers: {
@@ -265,7 +265,10 @@ Component({
       this._memberCareTicketsLoad = null;
       this._memberCareCardsLoad = null;
       this._equipOriginById = null;
+      this._equipEditChoiceMap = null;
       this._diffSerialMap = null;
+      this._fetchingOriginsMemberId = 0;
+      this._originFetchedMemberIds = null;
     },
   },
   methods: {
@@ -341,10 +344,21 @@ Component({
       const expandedMap = this.data.expandedMap || {};
       this.data.expandedMap = expandedMap;
       const displayCares = raw.map((care, idx) => {
+        if (!care.timeStamp) care.timeStamp = Date.now() + idx;
         const key = that._careKey(care, idx);
         const oldKey = 't' + care.timeStamp;
         if (care.timeStamp && that._manualTicketChoices && that._manualTicketChoices[oldKey]) {
           that._manualTicketChoices[key] = true;
+        }
+        if (oldKey !== key) {
+          if (that._equipEditChoiceMap && that._equipEditChoiceMap[oldKey]) {
+            that._equipEditChoiceMap[key] = that._equipEditChoiceMap[oldKey];
+            delete that._equipEditChoiceMap[oldKey];
+          }
+          if (that._diffSerialMap && that._diffSerialMap[oldKey] !== undefined) {
+            that._diffSerialMap[key] = that._diffSerialMap[oldKey];
+            delete that._diffSerialMap[oldKey];
+          }
         }
         // 找回中断单时后端 careImages 只带 image 导航对象，没有 van-uploader 需要的 url/thumb，补齐
         (care.careImages || []).forEach((im) => {
@@ -442,6 +456,7 @@ Component({
         summary: { count, totalLabel: total.toFixed(2), canCheckout },
       });
       this._scheduleOldCustomerTicket();
+      this._ensureEquipOriginsForCares(raw);
     },
     /* ---------- 同步父页 ---------- */
     // 去掉 _ 前缀派生字段和纯前端对象（ticket/product 保留 ticket_code 等标量即可）
@@ -691,6 +706,7 @@ Component({
         confirmColor: '#e64340',
         success(res) {
           if (!res.confirm) return;
+          if (care && care._key && that._equipEditChoiceMap) delete that._equipEditChoiceMap[care._key];
           const cares = (that.data.cares || []).slice();
           cares.splice(cidx, 1);
           that.data.cares = cares;
@@ -714,16 +730,37 @@ Component({
         if (snap) this._equipOriginById[snap.id] = snap;
       });
     },
+    _ensureEquipOriginsForCares(cares) {
+      const memberId = Number(this.data.memberId) || 0;
+      if (!memberId) return;
+      this._originFetchedMemberIds = this._originFetchedMemberIds || {};
+      const missing = (cares || []).some((c) => {
+        const id = Number(c && c.member_equipment_id) || 0;
+        return id > 0 && !(this._equipOriginById && this._equipOriginById[id]) && !c._equipOrigin;
+      });
+      if (!missing || this._fetchingOriginsMemberId === memberId || this._originFetchedMemberIds[memberId]) return;
+      this._fetchingOriginsMemberId = memberId;
+      this._fetchMemberEquips(memberId, '').then((list) => {
+        if (Number(this.data.memberId) !== memberId) return;
+        this._originFetchedMemberIds[memberId] = true;
+        this._rememberEquipOrigins(list || []);
+        this._refreshCares();
+      }).catch(() => {}).finally(() => {
+        if (this._fetchingOriginsMemberId === memberId) this._fetchingOriginsMemberId = 0;
+      });
+    },
     _deriveEquipAndSerialFields(care, key) {
       const split = equipDiff.splitSerials(care.serials);
       const diffMap = this._diffSerialMap || {};
+      const choiceMap = this._equipEditChoiceMap || {};
       const isSki = care.equipment === '双板';
       const diffSerial = isSki ? (diffMap[key] !== undefined ? !!diffMap[key] : split.diff) : false;
       const equipId = Number(care.member_equipment_id) || 0;
       const origin = equipId > 0
         ? ((this._equipOriginById && this._equipOriginById[equipId]) || care._equipOrigin || null)
         : null;
-      const modified = origin ? equipDiff.diffCareAgainstOrigin(care, origin).length > 0 : false;
+      const changes = origin ? equipDiff.diffCareAgainstOrigin(care, origin) : [];
+      const modified = changes.length > 0;
       return {
         _diffSerial: diffSerial,
         _singleSerial: diffSerial ? '' : split.serials,
@@ -732,10 +769,14 @@ Component({
         _linkedEquipId: equipId > 0 ? equipId : 0,
         _equipOrigin: origin,
         _equipModified: modified,
+        _equipModifiedBanner: equipDiff.formatModifiedBannerText(changes),
+        _equipEditChoice: choiceMap[key] || '',
       };
     },
     _clearLinkedMemberEquipments() {
       this._equipOriginById = {};
+      this._equipEditChoiceMap = {};
+      this._originFetchedMemberIds = {};
       const cares = (this.data.cares || []).slice();
       let touched = false;
       cares.forEach((c, i) => {
@@ -763,6 +804,9 @@ Component({
         this._maybeShowHistory(cidx, equip);
         return;
       }
+      if (cur && cur._key && this._equipEditChoiceMap) {
+        delete this._equipEditChoiceMap[cur._key];
+      }
       this._mutate(cidx, (c) => {
         c.equipment = equip;
         // 切换单/双板后重新归为新装备待选，避免把原类型的已有装备改成另一种类型
@@ -786,10 +830,22 @@ Component({
       const cidx = Number(e.currentTarget.dataset.cidx);
       const cur = this.data.displayCares[cidx];
       if (!cur || cur.card_equip_lock) return;
+      const origin = (this._equipOriginById && this._equipOriginById[cur.member_equipment_id]) || cur._equipOrigin || null;
+      const originSerial = origin ? equipDiff.normalizeSerials(origin.serials) : '';
+      const curSerial = equipDiff.normalizeSerials(cur.serials);
+      const shouldClearCopiedSerial = !!(originSerial && curSerial === originSerial);
+      if (cur._key) {
+        this._equipEditChoiceMap = this._equipEditChoiceMap || {};
+        this._equipEditChoiceMap[cur._key] = 'new';
+        if (shouldClearCopiedSerial && this._diffSerialMap) {
+          delete this._diffSerialMap[cur._key];
+        }
+      }
       this._mutate(cidx, (c) => {
         c.member_equipment_id = equipDiff.ExplicitNewSentinel;
+        if (shouldClearCopiedSerial) c.serials = null;
       }, true, false);
-      wx.showToast({ title: '已切换为录入新装备', icon: 'none' });
+      wx.showToast({ title: '已设为另存新装备', icon: 'none' });
     },
     onSerialDiffTap(e) {
       const cidx = Number(e.currentTarget.dataset.cidx);
@@ -806,6 +862,7 @@ Component({
       const val = e.detail.value || '';
       const cur = this.data.displayCares[cidx];
       if (!cur) return;
+      const prevSerial = equipDiff.normalizeSerials(cur.serials);
       let composed = null;
       if (cur.equipment === '双板' && cur._diffSerial) {
         const left = side === 'left' ? val : (cur._leftSerial || '');
@@ -814,8 +871,15 @@ Component({
       } else {
         composed = equipDiff.composeSerials(false, val, '', '');
       }
-      if ((cur.serials || null) === composed) return;
+      const nextSerial = equipDiff.normalizeSerials(composed);
+      if (prevSerial === nextSerial) return;
+      const equipId = Number(cur.member_equipment_id) || 0;
+      const locked = !!cur.card_equip_lock;
+      const prevDiffSerial = !!cur._diffSerial;
       this._mutate(cidx, (c) => { c.serials = composed; }, true, false);
+      if (equipId > 0 && !locked) {
+        this._maybePromptEquipEditChoice(cidx, 'serials', prevSerial, nextSerial, prevDiffSerial);
+      }
     },
     // 含包 / 含杖二选一：点「含包」勾上时自动取消「含杖」，再点一下取消；不影响价格，所以不重新计价
     onWithBagTap(e) {
@@ -887,8 +951,9 @@ Component({
       const equipWithType = { ...item, equipment: item.equipment || m.equip };
       this._rememberEquipOrigins([equipWithType]);
       const cur = this.data.displayCares[m.cidx];
-      if (cur && cur._key && this._diffSerialMap) {
-        delete this._diffSerialMap[cur._key];
+      if (cur && cur._key) {
+        if (this._diffSerialMap) delete this._diffSerialMap[cur._key];
+        if (this._equipEditChoiceMap) delete this._equipEditChoiceMap[cur._key];
       }
       this._mutate(m.cidx, (c) => {
         c.member_equipment_id = Number(item.id) > 0 ? Number(item.id) : null;
@@ -919,8 +984,9 @@ Component({
         return;
       }
       const cur = this.data.displayCares[m.cidx];
-      if (cur && cur._key && this._diffSerialMap) {
-        delete this._diffSerialMap[cur._key];
+      if (cur && cur._key) {
+        if (this._diffSerialMap) delete this._diffSerialMap[cur._key];
+        if (this._equipEditChoiceMap) delete this._equipEditChoiceMap[cur._key];
       }
       this._mutate(m.cidx, (c) => {
         c.member_equipment_id = equipDiff.ExplicitNewSentinel;
@@ -952,7 +1018,7 @@ Component({
       const locked = !!(care && care.card_equip_lock);
       this._mutate(cidx, (c) => { c.brand = newBrand; });
       if (equipId > 0 && !locked) {
-        this._promptLinkedEquipChange(cidx, 'brand', prevBrand, nextBrand);
+        this._maybePromptEquipEditChoice(cidx, 'brand', prevBrand, nextBrand);
       }
     },
     onAddBrandInput(e) {
@@ -987,7 +1053,7 @@ Component({
         const locked = !!(latest && latest.card_equip_lock);
         that._mutate(cidx, (c) => { c.brand = newBrand; });
         if (equipId > 0 && !locked) {
-          that._promptLinkedEquipChange(cidx, 'brand', prevBrand, nextBrand);
+          that._maybePromptEquipEditChoice(cidx, 'brand', prevBrand, nextBrand);
         }
       }).catch(() => {
         wx.showToast({ title: '新增品牌失败', icon: 'none' });
@@ -1006,17 +1072,23 @@ Component({
         const equipId = Number(cur && cur.member_equipment_id) || 0;
         this._mutate(cidx, (c) => { c.scale = nextScale || null; });
         if (equipId > 0) {
-          this._promptLinkedEquipChange(cidx, 'scale', prevScale, nextScale);
+          this._maybePromptEquipEditChoice(cidx, 'scale', prevScale, nextScale);
         }
         return;
       }
       this._mutate(cidx, (c) => { c[field] = value === '' ? null : value; });
     },
-    _promptLinkedEquipChange(cidx, field, prevValue, nextValue) {
+    _maybePromptEquipEditChoice(cidx, field, prevValue, nextValue, prevDiffSerial = false) {
       const cur = this.data.displayCares[cidx];
       const equipId = Number(cur && cur.member_equipment_id) || 0;
-      if (!cur || equipId <= 0) return;
+      if (!cur || equipId <= 0 || cur.card_equip_lock) return;
+      if (this._equipEditChoiceMap && cur._key && this._equipEditChoiceMap[cur._key]) {
+        return; // 本件装备已在本次开单中选定保存方式，后续改其他字段不再二次弹窗
+      }
       const origin = (this._equipOriginById && this._equipOriginById[equipId]) || cur._equipOrigin || null;
+      if (origin && equipDiff.diffCareAgainstOrigin(cur, origin).length === 0) {
+        return;
+      }
       const { equipSummary, changeLine } = equipDiff.formatSingleFieldChange(cur, origin, field, prevValue, nextValue);
       this.setData({
         equipChangeModal: {
@@ -1025,84 +1097,43 @@ Component({
           equipId,
           field,
           prevValue,
+          prevDiffSerial: !!prevDiffSerial,
           equipSummary,
           changeLine,
-          saving: false,
         },
       });
     },
-    async onEquipChangeUpdateOld() {
+    onEquipChangeUpdateOld() {
       const m = this.data.equipChangeModal;
-      if (!m || !m.show || m.saving) return;
+      if (!m || !m.show) return;
       const cur = this.data.displayCares[m.cidx];
-      if (!cur || Number(cur.member_equipment_id) !== m.equipId) {
-        this.setData({ 'equipChangeModal.show': false });
-        return;
-      }
-      this.setData({ 'equipChangeModal.saving': true });
-      let origin = (this._equipOriginById && this._equipOriginById[m.equipId]) || cur._equipOrigin || null;
-      const memberId = Number(this.data.memberId) || 0;
-      // 若恢复中断草稿尚未拉取过会员装备列表，先查一次补全原装备 image_id，避免更新时误清空首单代表图
-      if (!origin && memberId > 0) {
-        try {
-          const allEquips = await this._fetchMemberEquips(memberId, '');
-          this._rememberEquipOrigins(allEquips);
-          origin = (this._equipOriginById && this._equipOriginById[m.equipId]) || null;
-        } catch (_) {}
-      }
-      const fallbackItem = {
-        id: m.equipId,
-        equipment: cur.equipment,
-        brand: cur.brand,
-        scale: cur.scale,
-        serials: cur.serials,
-        image_id: origin ? origin.image_id : null,
-      };
-      let updatedImmediately = false;
-      if (typeof data.updateMemberEquipmentByStaffPromise === 'function') {
-        try {
-          const updated = await data.updateMemberEquipmentByStaffPromise({
-            id: m.equipId,
-            memberId,
-            equipment: cur.equipment,
-            brand: cur.brand || null,
-            scale: cur.scale || null,
-            serials: equipDiff.normalizeSerials(cur.serials) || null,
-            imageId: origin ? origin.image_id : null,
-          }, app.globalData.sessionKey);
-          this._rememberEquipOrigins([updated && Number(updated.id) > 0 ? updated : fallbackItem]);
-          updatedImmediately = true;
-        } catch (_) {
-          // 网络异常或后端尚未部署时，刷新本地快照并由结算接口兜底同步与记历史
-          this._rememberEquipOrigins([fallbackItem]);
-        }
-      } else {
-        this._rememberEquipOrigins([fallbackItem]);
-      }
-      if (this.data.cares && this.data.cares[m.cidx]) {
-        delete this.data.cares[m.cidx]._equipOrigin;
-      }
       this.setData({
-        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
+        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', prevDiffSerial: false, equipSummary: '', changeLine: '' },
       });
+      if (!cur || Number(cur.member_equipment_id) !== m.equipId) return;
+      if (cur._key) {
+        this._equipEditChoiceMap = this._equipEditChoiceMap || {};
+        this._equipEditChoiceMap[cur._key] = 'update';
+      }
       this._refreshCares();
-      wx.showToast({
-        title: updatedImmediately ? '已更新旧装备信息' : '已确认更新，结算时同步保存',
-        icon: 'none',
-      });
+      wx.showToast({ title: '下单时将更新旧装备', icon: 'none' });
     },
     onEquipChangeSaveAsNew() {
       const m = this.data.equipChangeModal;
-      if (!m || !m.show || m.saving) return;
+      if (!m || !m.show) return;
       const cur = this.data.displayCares[m.cidx];
       const origin = (this._equipOriginById && this._equipOriginById[m.equipId]) || (cur && cur._equipOrigin) || null;
       this.setData({
-        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
+        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', prevDiffSerial: false, equipSummary: '', changeLine: '' },
       });
       if (!cur) return;
+      if (cur._key) {
+        this._equipEditChoiceMap = this._equipEditChoiceMap || {};
+        this._equipEditChoiceMap[cur._key] = 'new';
+      }
       const originSerial = origin ? equipDiff.normalizeSerials(origin.serials) : '';
       const curSerial = equipDiff.normalizeSerials(cur.serials);
-      const shouldClearCopiedSerial = !!(originSerial && curSerial === originSerial);
+      const shouldClearCopiedSerial = m.field !== 'serials' && !!(originSerial && curSerial === originSerial);
       if (shouldClearCopiedSerial && cur._key && this._diffSerialMap) {
         delete this._diffSerialMap[cur._key];
       }
@@ -1110,19 +1141,24 @@ Component({
         c.member_equipment_id = equipDiff.ExplicitNewSentinel;
         if (shouldClearCopiedSerial) c.serials = null;
       }, true, false);
-      wx.showToast({ title: '已改为另存新装备', icon: 'none' });
+      wx.showToast({ title: '下单时将另存为新装备', icon: 'none' });
     },
     onEquipChangeCancel() {
       const m = this.data.equipChangeModal;
-      if (!m || !m.show || m.saving) return;
-      const { cidx, field, prevValue } = m;
+      if (!m || !m.show) return;
+      const { cidx, field, prevValue, prevDiffSerial } = m;
+      const cur = this.data.displayCares[cidx];
       this.setData({
-        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
+        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', prevDiffSerial: false, equipSummary: '', changeLine: '' },
       });
-      if (field && this.data.displayCares[cidx]) {
+      if (field && cur) {
+        if (field === 'serials' && cur._key) {
+          this._diffSerialMap = this._diffSerialMap || {};
+          this._diffSerialMap[cur._key] = !!prevDiffSerial;
+        }
         this._mutate(cidx, (c) => {
           c[field] = prevValue || null;
-        });
+        }, true, field !== 'serials');
       }
     },
     /* ---------- 服务项 ---------- */
@@ -2086,7 +2122,8 @@ Component({
           // 网络异常获取不到快照时，不阻断结算，后端仍做原子比对与审计
         }
       }
-      const modified = equipDiff.collectModifiedEquipments(this.data.displayCares);
+      const unconfirmedCares = (this.data.displayCares || []).filter((c) => c && c._equipEditChoice !== 'update');
+      const modified = equipDiff.collectModifiedEquipments(unconfirmedCares);
       if (modified.length === 0) return true;
       if (!wx || typeof wx.showModal !== 'function') return true;
       return new Promise((resolve) => {
@@ -2106,6 +2143,7 @@ Component({
     },
 
     async onCheckout() {
+      if (this.data.equipChangeModal && this.data.equipChangeModal.show) return;
       if (!this.data.summary.canCheckout || this.data.autoTicketCheckout || this.data.cardBusy) return;
       this.setData({ autoTicketCheckout: true });
       try {

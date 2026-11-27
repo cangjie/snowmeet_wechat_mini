@@ -133,12 +133,19 @@
   background: #fffbeb;
   border-color: #fde68a;
 }
+.linked-equip-bar--new {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
 .linked-equip-txt {
   font-size: 22rpx;
   color: #006495;
 }
 .linked-equip-bar--modified .linked-equip-txt {
   color: #92400e;
+}
+.linked-equip-bar--new .linked-equip-txt {
+  color: #166534;
 }
 .linked-equip-action {
   font-size: 23rpx;
