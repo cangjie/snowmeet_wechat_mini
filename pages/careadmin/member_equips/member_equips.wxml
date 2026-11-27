@@ -1,0 +1,191 @@
+<view class="page">
+  <!-- 顶部会员与分类筛选 -->
+  <view class="top-bar">
+    <view class="member-line" wx:if="{{memberName || memberId}}">
+      <text class="member-name">{{memberName || ('会员 #' + memberId)}}</text>
+      <text class="member-count">共 {{counts.all}} 件装备</text>
+    </view>
+    <view class="tabs">
+      <view class="tab {{tab === 'all' ? 'tab--on' : ''}}" data-tab="all" bindtap="onTabTap">全部 {{counts.all}}</view>
+      <view class="tab {{tab === '双板' ? 'tab--on' : ''}}" data-tab="双板" bindtap="onTabTap">双板 {{counts.ski}}</view>
+      <view class="tab {{tab === '单板' ? 'tab--on' : ''}}" data-tab="单板" bindtap="onTabTap">单板 {{counts.board}}</view>
+    </view>
+  </view>
+
+  <!-- 装备列表 -->
+  <scroll-view class="list-scroll" scroll-y>
+    <view wx:if="{{loading}}" class="empty-tip">加载中…</view>
+    <view wx:elif="{{filteredItems.length === 0}}" class="empty-tip">
+      <van-icon name="setting-o" size="42px" color="#bfc7d1" />
+      <text class="empty-txt">暂无装备记录</text>
+      <text class="empty-sub">可点击下方「新增装备」，或在养护开单时自动录入</text>
+    </view>
+    <block wx:else>
+      <view class="equip-card" wx:for="{{filteredItems}}" wx:key="id">
+        <view class="equip-main">
+          <image wx:if="{{item._photoUrl}}" class="equip-photo" mode="aspectFill" src="{{item._photoUrl}}"
+                 data-url="{{item._photoFullUrl}}" catchtap="onPreviewPhoto" />
+          <view wx:else class="equip-photo equip-photo--empty">
+            <van-icon name="photo-o" size="24px" color="#9ca3af" />
+          </view>
+          <view class="equip-info">
+            <view class="equip-title-row">
+              <text class="type-badge {{item.equipment === '双板' ? 'type-badge--ski' : 'type-badge--board'}}">{{item.equipment}}</text>
+              <text class="equip-brand">{{item._brandText}}</text>
+              <text wx:if="{{item.scale}}" class="equip-scale">{{item.scale}}cm</text>
+            </view>
+            <view wx:if="{{item._serialText}}" class="equip-meta">序列号：{{item._serialText}}</view>
+            <view class="equip-meta">{{item._dateLine}}</view>
+          </view>
+        </view>
+        <view class="equip-actions">
+          <view class="act-btn" data-id="{{item.id}}" bindtap="onOpenHistory">
+            <van-icon name="clock-o" size="14px" color="#3f4850" />
+            <text>修改记录</text>
+          </view>
+          <view class="act-btn act-btn--primary" data-idx="{{index}}" bindtap="onOpenEdit">
+            <van-icon name="edit" size="14px" color="#006495" />
+            <text>编辑</text>
+          </view>
+          <view class="act-btn act-btn--danger" data-idx="{{index}}" bindtap="onDeleteTap">
+            <van-icon name="delete-o" size="14px" color="#ba1a1a" />
+            <text>删除</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view class="bottom-pad"></view>
+  </scroll-view>
+
+  <!-- 底部固定新增按钮 -->
+  <view class="footer-bar">
+    <view class="add-btn" bindtap="onOpenCreate">
+      <van-icon name="plus" size="16px" color="#ffffff" />
+      <text>新增装备</text>
+    </view>
+  </view>
+
+  <!-- 新增 / 编辑弹层 -->
+  <view wx:if="{{editor.show}}" class="mask" bindtap="onCloseEditor" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-head">
+        <text class="sheet-title">{{editor.id ? '编辑装备' : '新增装备'}}</text>
+        <view class="sheet-close" bindtap="onCloseEditor"><van-icon name="cross" size="18px" color="#3f4850" /></view>
+      </view>
+      <scroll-view class="sheet-body" scroll-y>
+        <!-- 装备类型 -->
+        <view class="field-group">
+          <text class="field-label">装备类型</text>
+          <view class="seg">
+            <view class="seg-item {{editor.equipment === '双板' ? 'seg-item--on' : ''}}" data-equip="双板" bindtap="onEditorEquipTap">双板</view>
+            <view class="seg-item {{editor.equipment === '单板' ? 'seg-item--on' : ''}}" data-equip="单板" bindtap="onEditorEquipTap">单板</view>
+          </view>
+        </view>
+
+        <!-- 品牌 -->
+        <view class="field-group">
+          <text class="field-label">品牌</text>
+          <picker range="{{editor.brandListView}}" value="{{editor.brandIndex >= 0 ? editor.brandIndex : 0}}" bindchange="onEditorBrandChange">
+            <view class="field-input field-picker">
+              <text class="{{editor.brand ? 'field-val' : 'field-ph'}}">{{editor.brand || '点击选择品牌'}}</text>
+              <van-icon name="arrow-down" size="14px" color="#6f7881" />
+            </view>
+          </picker>
+        </view>
+
+        <!-- 长度 -->
+        <view class="field-group">
+          <text class="field-label">长度 (cm)</text>
+          <input class="field-input" type="digit" placeholder="如 165" value="{{editor.scale}}" bindinput="onEditorScaleInput" />
+        </view>
+
+        <!-- 序列号 -->
+        <view class="field-group">
+          <view class="field-label-row">
+            <text class="field-label">序列号（选填）</text>
+            <view wx:if="{{editor.equipment === '双板'}}"
+                  class="diff-toggle {{editor.diffSerial ? 'diff-toggle--on' : ''}}"
+                  bindtap="onEditorDiffSerialTap">分左右</view>
+          </view>
+          <block wx:if="{{editor.equipment === '双板' && editor.diffSerial}}">
+            <input class="field-input field-input--gap" placeholder="左板序列号" value="{{editor.leftSerial}}" data-side="left" bindinput="onEditorSplitSerialInput" />
+            <input class="field-input" placeholder="右板序列号" value="{{editor.rightSerial}}" data-side="right" bindinput="onEditorSplitSerialInput" />
+          </block>
+          <input wx:else class="field-input" placeholder="如有序列号可录入" value="{{editor.serials}}" bindinput="onEditorSerialInput" />
+        </view>
+
+        <!-- 装备照片 -->
+        <view class="field-group">
+          <text class="field-label">装备照片（选填）</text>
+          <view class="photo-editor">
+            <view wx:if="{{editor.photoUrl}}" class="photo-preview-wrap">
+              <image class="photo-preview" mode="aspectFill" src="{{editor.photoUrl}}" data-url="{{editor.photoFullUrl || editor.photoUrl}}" catchtap="onPreviewPhoto" />
+              <view class="photo-remove" catchtap="onEditorRemovePhoto"><van-icon name="cross" size="12px" color="#ffffff" /></view>
+            </view>
+            <view class="photo-upload-btn" bindtap="onEditorChoosePhoto">
+              <van-icon name="photograph" size="22px" color="#006495" />
+              <text>{{editor.uploading ? '上传中…' : (editor.photoUrl ? '更换照片' : '上传照片')}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="sheet-foot">
+        <view class="foot-btn foot-btn--ghost" bindtap="onCloseEditor">取消</view>
+        <view class="foot-btn foot-btn--primary" bindtap="onSaveEditor">{{editor.saving ? '保存中…' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增品牌弹窗 -->
+  <view wx:if="{{addBrand.show}}" class="mask mask--center" bindtap="onCloseAddBrand" catchtouchmove="noop">
+    <view class="dialog" catchtap="noop">
+      <view class="dialog-title">新增{{editor.equipment}}品牌</view>
+      <input class="field-input field-input--gap" placeholder="英文名称（必填）" value="{{addBrand.name}}" data-field="name" bindinput="onAddBrandInput" />
+      <input class="field-input" placeholder="中文名称（选填）" value="{{addBrand.chineseName}}" data-field="chineseName" bindinput="onAddBrandInput" />
+      <view class="sheet-foot sheet-foot--dialog">
+        <view class="foot-btn foot-btn--ghost" bindtap="onCloseAddBrand">取消</view>
+        <view class="foot-btn foot-btn--primary" bindtap="onConfirmAddBrand">确认</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 修改记录弹层 -->
+  <view wx:if="{{history.show}}" class="mask" bindtap="onCloseHistory" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-head">
+        <text class="sheet-title">修改记录</text>
+        <view class="sheet-close" bindtap="onCloseHistory"><van-icon name="cross" size="18px" color="#3f4850" /></view>
+      </view>
+      <view wx:if="{{history.equipTitle}}" class="hist-subtitle">{{history.equipTitle}}</view>
+      <scroll-view class="sheet-body" scroll-y>
+        <view wx:if="{{history.loading}}" class="empty-tip">加载中…</view>
+        <view wx:elif="{{history.rows.length === 0}}" class="empty-tip">暂无修改记录</view>
+        <block wx:else>
+          <view class="hist-row" wx:for="{{history.rows}}" wx:key="index">
+            <view class="hist-top">
+              <text class="hist-badge hist-badge--{{item.kind}}">{{item.fieldLabel}}</text>
+              <text class="hist-time">{{item._timeStr}}</text>
+            </view>
+            <view wx:if="{{item.kind === 'create'}}" class="hist-val">{{item.to || '创建装备档案'}}</view>
+            <view wx:elif="{{item.field === 'image_id'}}" class="hist-photo-diff">
+              <view class="hist-photo-side">
+                <image wx:if="{{item.fromPhotoUrl}}" class="hist-thumb" mode="aspectFill" src="{{item.fromPhotoUrl}}" data-url="{{item.fromPhotoUrl}}" catchtap="onPreviewPhoto" />
+                <text wx:else class="hist-val-muted">{{item.from}}</text>
+              </view>
+              <text class="hist-arrow">→</text>
+              <view class="hist-photo-side">
+                <image wx:if="{{item.toPhotoUrl}}" class="hist-thumb" mode="aspectFill" src="{{item.toPhotoUrl}}" data-url="{{item.toPhotoUrl}}" catchtap="onPreviewPhoto" />
+                <text wx:else class="hist-val-muted">{{item.to}}</text>
+              </view>
+            </view>
+            <view wx:else class="hist-val">{{item.from}} → {{item.to}}</view>
+            <view class="hist-meta">操作人：{{item.staffName}}{{item.scene ? ' · ' + item.scene : ''}}{{item.memo ? ' · ' + item.memo : ''}}</view>
+          </view>
+        </block>
+      </scroll-view>
+      <view class="sheet-foot">
+        <view class="foot-btn foot-btn--primary" bindtap="onCloseHistory">关闭</view>
+      </view>
+    </view>
+  </view>
+</view>

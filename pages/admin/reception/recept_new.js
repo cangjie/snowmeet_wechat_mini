@@ -480,8 +480,12 @@ Page({
 
   onCheckout(e) {
     if (this.data.bizType === 'maintain') {
+      const d = (e && e.detail) || {};
+      if (Array.isArray(d.cares)) {
+        this.setData({ 'order.cares': d.cares });
+      }
       // useDeposit：care_recept_form 传来的「使用储值支付」意向，随去结算落到订单（本期仅记录）
-      this._checkoutCare(!!(e && e.detail && e.detail.useDeposit));
+      this._checkoutCare(!!d.useDeposit);
       return;
     }
     const order = this.data.order;

@@ -338,6 +338,15 @@ Page({
     wx.navigateTo({ url: '/pages/mine/punchcard_usage?cardId=' + cardId + '&staff=1' })
   },
 
+  gotoMemberEquips() {
+    if (!this.data.memberId) { return }
+    var name = (this.data.member && this.data.member.name) || ''
+    wx.navigateTo({
+      url: '/pages/careadmin/member_equips/member_equips?memberId=' + this.data.memberId
+        + '&memberName=' + encodeURIComponent(name)
+    })
+  },
+
   onOrderTab(e) {
     var t = e.currentTarget.dataset.t
     var all = (this.data.member && this.data.member.recentOrders) || []

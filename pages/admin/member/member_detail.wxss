@@ -4,6 +4,8 @@
 
 .card { margin: 20rpx 24rpx 0; background: #fff; border-radius: 22rpx; border: 1rpx solid rgba(191,199,209,.3); padding: 26rpx 28rpx; }
 .card-title { display: flex; align-items: center; gap: 12rpx; margin-bottom: 18rpx; }
+.card-title--link { margin-bottom: 0; }
+.card-title--link .card-title-txt { flex: 1; }
 .card-title-txt { font-size: 28rpx; font-weight: 700; color: #0b1c30; }
 .card-edit { margin-left: auto; display: flex; align-items: center; gap: 4rpx; height: 50rpx; padding: 0 18rpx;
   border-radius: 12rpx; border: 1rpx solid #006495; background: #e1edf7; }

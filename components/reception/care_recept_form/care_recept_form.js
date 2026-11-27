@@ -14,6 +14,7 @@ const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
 const cardRules = require('../../../utils/careCardSale.js');
 const bestBenefit = require('../../../utils/care_best_benefit.js');
+const equipDiff = require('../../../utils/member_equipment_diff.js');
 
 // 与 data.js uploadFilePromise 的上传域名保持一致（文件落在处理上传那台服务器的磁盘）
 const UPLOAD_HOST = data.IMAGE_HOST;
@@ -118,10 +119,12 @@ async function mapConcurrent(items, limit, fn) {
 }
 
 // 新建一个空 care（snake_case 对齐后端；valid=0 草稿态，PlaceCareOrder 才置 1）
+// member_equipment_id = -1 表示新版开单明确录入的新装备，下单提交时由后端创建 member_equipment 并回填真实 id
 function blankCare() {
   return {
     id: 0,
     order_id: null,
+    member_equipment_id: equipDiff.ExplicitNewSentinel,
     biz_type: null,
     equipment: null,
     brand: null,
@@ -178,7 +181,14 @@ Component({
     memberId: {
       type: null,
       value: null,
-      observer(v) { this._loadDeposit(v); this._loadMachineWaxAvailability(v); this._scheduleOldCustomerTicket(); },
+      observer(v, prev) {
+        if (prev && Number(prev) !== Number(v)) {
+          this._clearLinkedMemberEquipments();
+        }
+        this._loadDeposit(v);
+        this._loadMachineWaxAvailability(v);
+        this._scheduleOldCustomerTicket();
+      },
     },
     cares: { type: Array, value: [] },
     cardPreview: { type: Object, value: null },
@@ -214,9 +224,9 @@ Component({
     amountModal: { show: false, title: '', placeholder: '', value: '', cidx: -1, field: '' },
     // 优惠券/会员卡弹层
     ticketPopup: { show: false, cidx: -1, selectedCode: null, selectedCardId: null, selectedCoachCardId: null, disabledCodes: [], tier: '', commonCharge: 0, urgent: 0 },
-    // 历史装备弹层：会员选定装备类型后，列出其养护过的同类型装备供直接选择；
-    // 也可在弹层里手动选品牌 + 填长度（列表里没有的新装备）
-    historyModal: { show: false, cidx: -1, equip: '', list: [], brandListView: [], brandIndex: null, brand: '', scale: '' },
+    // 会员装备选择弹层：会员选定装备类型后，从其名下装备列表读取同类型装备供选择；
+    // 也可在弹层里填写新装备（下单提交时自动加入该会员装备列表）
+    historyModal: { show: false, cidx: -1, equip: '', list: [], brandListView: [], brandIndex: null, brand: '', scale: '', serials: '' },
     expandedMap: {},
   },
   observers: {
@@ -252,6 +262,8 @@ Component({
       this._oldCustomerTicketState = null;
       this._memberCareTicketsLoad = null;
       this._memberCareCardsLoad = null;
+      this._equipOriginById = null;
+      this._diffSerialMap = null;
     },
   },
   methods: {
@@ -414,6 +426,8 @@ Component({
           _specialKey: care.entertain ? 'entertain' : (care.warranty ? 'warranty' : 'none'),
           // 券或未绑季卡对每套装备开放；已绑季卡只对匹配绑定信息的装备开放。
           _hasFreeWaxTicket: that._canShowMachineWax(care),
+          // 序列号拆合（双板支持分左右）与会员装备快照关联
+          ...that._deriveEquipAndSerialFields(care, key),
         };
       });
       const count = displayCares.length;
@@ -684,6 +698,56 @@ Component({
       });
     },
     /* ---------- 装备信息 ---------- */
+    _fetchMemberEquips(memberId, equip) {
+      const fn = typeof data.getMemberEquipmentsByStaffPromise === 'function'
+        ? data.getMemberEquipmentsByStaffPromise
+        : data.getMemberCaredEquipmentsPromise;
+      if (typeof fn !== 'function') return Promise.resolve([]);
+      return fn(memberId, equip, app.globalData.sessionKey);
+    },
+    _rememberEquipOrigins(list) {
+      this._equipOriginById = this._equipOriginById || {};
+      (list || []).forEach((it) => {
+        const snap = equipDiff.snapshotFromEquipment(it);
+        if (snap) this._equipOriginById[snap.id] = snap;
+      });
+    },
+    _deriveEquipAndSerialFields(care, key) {
+      const split = equipDiff.splitSerials(care.serials);
+      const diffMap = this._diffSerialMap || {};
+      const isSki = care.equipment === '双板';
+      const diffSerial = isSki ? (diffMap[key] !== undefined ? !!diffMap[key] : split.diff) : false;
+      const equipId = Number(care.member_equipment_id) || 0;
+      const origin = equipId > 0
+        ? ((this._equipOriginById && this._equipOriginById[equipId]) || care._equipOrigin || null)
+        : null;
+      const modified = origin ? equipDiff.diffCareAgainstOrigin(care, origin).length > 0 : false;
+      return {
+        _diffSerial: diffSerial,
+        _singleSerial: diffSerial ? '' : split.serials,
+        _leftSerial: split.leftSerial,
+        _rightSerial: split.rightSerial,
+        _linkedEquipId: equipId > 0 ? equipId : 0,
+        _equipOrigin: origin,
+        _equipModified: modified,
+      };
+    },
+    _clearLinkedMemberEquipments() {
+      this._equipOriginById = {};
+      const cares = (this.data.cares || []).slice();
+      let touched = false;
+      cares.forEach((c, i) => {
+        if (c && Number(c.member_equipment_id) > 0) {
+          cares[i] = { ...c, member_equipment_id: equipDiff.ExplicitNewSentinel };
+          delete cares[i]._equipOrigin;
+          touched = true;
+        }
+      });
+      if (touched) {
+        this.data.cares = cares;
+        this._refreshCares();
+      }
+    },
     onEquipTap(e) {
       const cidx = Number(e.currentTarget.dataset.cidx);
       const equip = e.currentTarget.dataset.equip;
@@ -693,20 +757,63 @@ Component({
         return;
       }
       if (cur && cur.equipment === equip) {
-        // 重新选择同类型装备时，先保留当前信息，选定历史装备后再更新。
+        // 重新选择同类型装备时，先保留当前信息，选定已有装备后再更新。
         this._maybeShowHistory(cidx, equip);
         return;
       }
       this._mutate(cidx, (c) => {
         c.equipment = equip;
-        // 换类型后品牌/其它服务字典跟随切换，原选择作废
+        // 切换单/双板后重新归为新装备待选，避免把原类型的已有装备改成另一种类型
+        c.member_equipment_id = equipDiff.ExplicitNewSentinel;
         c.brand = null;
         c.repair_memo = null;
         c.need_repair = 0;
-        // 单板没有雪杖：换成单板时取消「含杖」
-        if (equip === '单板') c.with_pole = false;
+        // 单板没有雪杖，也没有左右双板序列号
+        if (equip === '单板') {
+          c.with_pole = false;
+          if (this._diffSerialMap && cur && cur._key) delete this._diffSerialMap[cur._key];
+          if (c.serials && String(c.serials).indexOf('|') >= 0) {
+            const sp = equipDiff.splitSerials(c.serials);
+            c.serials = sp.leftSerial || sp.rightSerial || null;
+          }
+        }
       });
       this._maybeShowHistory(cidx, equip);
+    },
+    onUnlinkEquipment(e) {
+      const cidx = Number(e.currentTarget.dataset.cidx);
+      const cur = this.data.displayCares[cidx];
+      if (!cur || cur.card_equip_lock) return;
+      this._mutate(cidx, (c) => {
+        c.member_equipment_id = equipDiff.ExplicitNewSentinel;
+      }, true, false);
+      wx.showToast({ title: '已切换为录入新装备', icon: 'none' });
+    },
+    onSerialDiffTap(e) {
+      const cidx = Number(e.currentTarget.dataset.cidx);
+      const cur = this.data.displayCares[cidx];
+      if (!cur || cur.equipment !== '双板') return;
+      this._diffSerialMap = this._diffSerialMap || {};
+      const next = !cur._diffSerial;
+      this._diffSerialMap[cur._key] = next;
+      this._mutate(cidx, (c) => { c.serials = null; }, true, false);
+    },
+    onSerialBlur(e) {
+      const cidx = Number(e.currentTarget.dataset.cidx);
+      const side = e.currentTarget.dataset.side || 'single';
+      const val = e.detail.value || '';
+      const cur = this.data.displayCares[cidx];
+      if (!cur) return;
+      let composed = null;
+      if (cur.equipment === '双板' && cur._diffSerial) {
+        const left = side === 'left' ? val : (cur._leftSerial || '');
+        const right = side === 'right' ? val : (cur._rightSerial || '');
+        composed = equipDiff.composeSerials(true, '', left, right);
+      } else {
+        composed = equipDiff.composeSerials(false, val, '', '');
+      }
+      if ((cur.serials || null) === composed) return;
+      this._mutate(cidx, (c) => { c.serials = composed; }, true, false);
     },
     // 含包 / 含杖二选一：点「含包」勾上时自动取消「含杖」，再点一下取消；不影响价格，所以不重新计价
     onWithBagTap(e) {
@@ -731,21 +838,27 @@ Component({
         if (on) c.with_bag = false;
       }, true, false);
     },
-    /* ---------- 历史装备弹层：会员 + 有同类型养护记录才弹 ---------- */
+    /* ---------- 会员装备选择弹层：会员 + 名下有同类型装备时弹出 ---------- */
     _maybeShowHistory(cidx, equip) {
       const that = this;
       const memberId = this.data.memberId;
       if (!memberId) return; // 散客：直接在页面上填品牌/长度
-      data.getMemberCaredEquipmentsPromise(memberId, equip, app.globalData.sessionKey).then((list) => {
+      this._fetchMemberEquips(memberId, equip).then((list) => {
         list = list || [];
+        that._rememberEquipOrigins(list);
         // 异步返回时确认该装备的类型没有再被切换
         const cur = that.data.displayCares[cidx];
         if (!cur || cur.equipment !== equip) return;
-        if (list.length === 0) return; // 无历史记录：不弹，走页面填写
+        if (list.length === 0) return; // 名下暂无同类型装备：直接走页面填写新装备
+        const curEquipId = Number(cur.member_equipment_id) || 0;
         const view = list.map((it) => ({
           ...it,
-          _brandDisp: it.brand ? String(it.brand).split('/')[0] : '',
-          _dateStr: it.last_care_date ? String(it.last_care_date).slice(0, 10) : '',
+          _selected: Number(it.id) > 0 && Number(it.id) === curEquipId,
+          _brandDisp: it.brand ? String(it.brand).split('/')[0] : '未填品牌',
+          _serialText: equipDiff.formatSerialsDisplay(it.serials),
+          _dateStr: it.last_care_date
+            ? ('上次养护 ' + String(it.last_care_date).slice(0, 10))
+            : (it.create_date ? ('建档 ' + String(it.create_date).slice(0, 10)) : ''),
           _photoUrl: uploadUrl(it.photoUrl),
           _photoPreviewUrl: uploadUrl(it.photoFullUrl || it.photoUrl),
         }));
@@ -753,7 +866,7 @@ Component({
         that.setData({
           historyModal: {
             show: true, cidx, equip, list: view,
-            brandListView, brandIndex: null, brand: '', scale: '',
+            brandListView, brandIndex: null, brand: '', scale: '', serials: '',
           },
         });
       }).catch(() => {}); // 查询失败静默降级为页面填写
@@ -769,9 +882,17 @@ Component({
       const m = this.data.historyModal;
       const item = m.list[idx];
       if (!item) return;
+      const equipWithType = { ...item, equipment: item.equipment || m.equip };
+      this._rememberEquipOrigins([equipWithType]);
+      const cur = this.data.displayCares[m.cidx];
+      if (cur && cur._key && this._diffSerialMap) {
+        delete this._diffSerialMap[cur._key];
+      }
       this._mutate(m.cidx, (c) => {
+        c.member_equipment_id = Number(item.id) > 0 ? Number(item.id) : null;
         c.brand = item.brand || null;
         c.scale = item.scale || null;
+        c.serials = equipDiff.normalizeSerials(item.serials) || null;
       });
       this.setData({ 'historyModal.show': false });
     },
@@ -783,22 +904,32 @@ Component({
     onHistoryScaleInput(e) {
       this.setData({ 'historyModal.scale': e.detail.value });
     },
+    onHistorySerialInput(e) {
+      this.setData({ 'historyModal.serials': e.detail.value });
+    },
     onHistoryManualConfirm() {
       const m = this.data.historyModal;
       const brand = (m.brand || '').trim();
       const scale = (m.scale || '').trim();
+      const serials = equipDiff.normalizeSerials(m.serials) || null;
       if (!brand || !scale) {
         wx.showToast({ title: '请选择品牌并填写长度', icon: 'none' });
         return;
       }
+      const cur = this.data.displayCares[m.cidx];
+      if (cur && cur._key && this._diffSerialMap) {
+        delete this._diffSerialMap[cur._key];
+      }
       this._mutate(m.cidx, (c) => {
+        c.member_equipment_id = equipDiff.ExplicitNewSentinel;
         c.brand = brand;
         c.scale = scale;
+        c.serials = serials;
       });
       this.setData({ 'historyModal.show': false });
     },
     onHistoryClose() {
-      // 跳过：不改动 care，店员回到页面上照常填写
+      // 跳过：不改动已选内容，未选已有装备时保持作为新装备在表单录入
       this.setData({ 'historyModal.show': false });
     },
     onBrandChange(e) {
@@ -1566,6 +1697,13 @@ Component({
             if (c.equipment === '单板') c.with_pole = false;   // 季卡绑的是单板：没有雪杖
             c.brand = card.equip_brand;
             c.scale = card.equip_scale;
+            // 若原关联的会员装备与季卡绑定装备不一致，解除指定 id，由后端按类型+品牌+长度自动匹配或建档，防错改另一块板
+            const orig = (Number(c.member_equipment_id) > 0 && that._equipOriginById && that._equipOriginById[c.member_equipment_id]) || null;
+            if (orig && (orig.equipment !== equipDiff.normalizeText(card.equip_type)
+              || orig.brand !== equipDiff.normalizeText(card.equip_brand)
+              || orig.scale !== equipDiff.normalizeText(card.equip_scale))) {
+              c.member_equipment_id = null;
+            }
             c.card_equip_lock = true;
             c.card_pending_open = false;
           } else {
@@ -1683,12 +1821,17 @@ Component({
     // 姓名/手机号必须一并回传——顶部会员条按 customer.cell 反查会员，只换 memberId
     // 会让条上还挂着原顾客的名字和手机号
     _switchMemberTo(detail, memberId, memberName) {
+      this._equipOriginById = {};
       const cares = this.data.displayCares || [];
       let cleared = 0;
       cares.forEach((c, i) => {
-        if (!c.ticket_code && !c.use_card) return;
-        cleared += 1;
+        const hadBenefit = !!(c.ticket_code || c.use_card);
+        const hadEquip = Number(c.member_equipment_id) > 0;
+        if (!hadBenefit && !hadEquip) return;
+        if (hadBenefit) cleared += 1;
         this._mutate(i, (x) => {
+          if (hadEquip) x.member_equipment_id = equipDiff.ExplicitNewSentinel;
+          if (!hadBenefit) return;
           x.ticket = null;
           x.ticket_code = null;
           x.use_card = false;
@@ -1781,6 +1924,42 @@ Component({
     },
 
     /* ---------- 结算 ---------- */
+    async _confirmEquipmentModifications() {
+      const memberId = Number(this.data.memberId) || 0;
+      if (!memberId) return true;
+      const curList = this.data.displayCares || [];
+      const needLoad = curList.some((c) => {
+        const id = Number(c && c.member_equipment_id) || 0;
+        return id > 0 && !(this._equipOriginById && this._equipOriginById[id]) && !c._equipOrigin;
+      });
+      if (needLoad) {
+        try {
+          const allEquips = await this._fetchMemberEquips(memberId, '');
+          this._rememberEquipOrigins(allEquips);
+          this._refreshCares();
+        } catch (_) {
+          // 网络异常获取不到快照时，不阻断结算，后端仍做原子比对与审计
+        }
+      }
+      const modified = equipDiff.collectModifiedEquipments(this.data.displayCares);
+      if (modified.length === 0) return true;
+      if (!wx || typeof wx.showModal !== 'function') return true;
+      return new Promise((resolve) => {
+        wx.showModal({
+          title: '确认修改会员装备',
+          content: equipDiff.formatConfirmContent(modified),
+          confirmText: '保存并结算',
+          cancelText: '返回检查',
+          success(res) {
+            resolve(!!(res && res.confirm));
+          },
+          fail() {
+            resolve(false);
+          },
+        });
+      });
+    },
+
     async onCheckout() {
       if (!this.data.summary.canCheckout || this.data.autoTicketCheckout || this.data.cardBusy) return;
       this.setData({ autoTicketCheckout: true });
@@ -1792,6 +1971,9 @@ Component({
         await this._autoSelectOldCustomerTicket();
         await this.waitForPrices();
         if (this._ticketAutoDetached || this.data.cardBusy || !this.data.summary.canCheckout) return;
+        // 若选择了会员已有装备并修改了品牌/长度/序列号，弹窗提示确认后再保存进数据库并记录修改历史
+        const confirmed = await this._confirmEquipmentModifications();
+        if (!confirmed || this._ticketAutoDetached || this.data.cardBusy || !this.data.summary.canCheckout) return;
         const cares = this.data.displayCares.map((c) => this._stripUI(c));
         // 自动选券及优惠计价完成后再提交，避免列表晚到时按原价结算。
         this.triggerEvent('checkout', { cares, useDeposit: this.data.useDeposit });

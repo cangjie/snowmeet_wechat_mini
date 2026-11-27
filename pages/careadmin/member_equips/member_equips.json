@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "会员装备列表",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index"
+  }
+}

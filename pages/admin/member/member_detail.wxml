@@ -68,6 +68,15 @@
       <view wx:if="{{member.contactCellsStr}}" class="acc-row"><text class="acc-k">联系手机号</text><view style="display: inline-flex; align-items: center;"><text class="acc-v mono">{{member.contactCellsStr}}</text><phone-copy phone="{{member.contactCellsStr}}" /></view></view>
     </view>
 
+    <!-- 名下装备 -->
+    <view class="card">
+      <view class="card-title card-title--tap card-title--link" bindtap="gotoMemberEquips">
+        <van-icon name="setting-o" size="16px" color="#006495" />
+        <text class="card-title-txt">名下装备<text class="cp-total"> · {{member.equipmentCount || 0}} 件</text></text>
+        <van-icon name="arrow" size="14px" color="#bfc7d1" />
+      </view>
+    </view>
+
     <!-- 名下次卡 -->
     <view class="card" wx:if="{{member.punchCards.length > 0}}">
       <view class="card-title"><van-icon name="coupon-o" size="16px" color="#006495" /><text class="card-title-txt">名下次卡</text></view>

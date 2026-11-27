@@ -106,6 +106,46 @@
                 </view>
               </view>
 
+              <!-- 已关联会员装备状态条（支持一键改为录入新装备） -->
+              <view wx:if="{{care._linkedEquipId > 0 && !care.card_equip_lock}}" class="linked-equip-bar {{care._equipModified ? 'linked-equip-bar--modified' : ''}}">
+                <text class="linked-equip-txt">{{care._equipModified ? '已修改所选会员装备（结算时将提示保存并记历史）' : '已选用会员名下装备'}}</text>
+                <text class="linked-equip-action" data-cidx="{{cidx}}" catchtap="onUnlinkEquipment">改为新装备</text>
+              </view>
+
+              <!-- 序列号（选填，双板可分左右） -->
+              <view class="form-group serial-group">
+                <view class="serial-head">
+                  <text class="kv-label">序列号（选填）</text>
+                  <view wx:if="{{care.equipment === '双板'}}"
+                        class="serial-diff-pill {{care._diffSerial ? 'serial-diff-pill--on' : ''}}"
+                        data-cidx="{{cidx}}" catchtap="onSerialDiffTap">分左右</view>
+                </view>
+                <view wx:if="{{care.equipment === '双板' && care._diffSerial}}" class="kv-row serial-split-row">
+                  <view class="kv-cell">
+                    <input class="kv-input"
+                           value="{{care._leftSerial || ''}}"
+                           placeholder="左板序列号"
+                           placeholder-class="form-input-placeholder"
+                           data-cidx="{{cidx}}" data-side="left"
+                           catchblur="onSerialBlur"/>
+                  </view>
+                  <view class="kv-cell">
+                    <input class="kv-input"
+                           value="{{care._rightSerial || ''}}"
+                           placeholder="右板序列号"
+                           placeholder-class="form-input-placeholder"
+                           data-cidx="{{cidx}}" data-side="right"
+                           catchblur="onSerialBlur"/>
+                  </view>
+                </view>
+                <input wx:else class="form-input"
+                       value="{{care._singleSerial || ''}}"
+                       placeholder="如有序列号可填写"
+                       placeholder-class="form-input-placeholder"
+                       data-cidx="{{cidx}}" data-side="single"
+                       catchblur="onSerialBlur"/>
+              </view>
+
               <!-- 优惠券/会员卡（互斥单选） -->
               <view class="form-group">
                 <view class="form-label">优惠券/卡</view>
@@ -377,27 +417,30 @@
                         urgent="{{ticketPopup.urgent}}"
                         disabledCodes="{{ticketPopup.disabledCodes}}"/>
 
-  <!-- 历史装备弹层：会员养护过的同类型装备直接选择，或手动填品牌/长度 -->
+  <!-- 会员装备选择弹层：从该会员装备列表中选择同类型装备，或录入新装备 -->
   <van-popup show="{{historyModal.show}}" position="bottom" round bind:close="onHistoryClose">
     <view class="history-modal">
-      <view class="history-modal-title">该会员养护过的{{historyModal.equip}}</view>
-      <view class="history-modal-subtitle">点击直接带入品牌和长度</view>
+      <view class="history-modal-title">选择该会员的{{historyModal.equip}}</view>
+      <view class="history-modal-subtitle">点击带入品牌、长度和序列号（当次板况照片仍需拍摄）</view>
       <scroll-view scroll-y class="history-list">
-        <view class="history-item" wx:for="{{historyModal.list}}" wx:key="index"
+        <view class="history-item {{item._selected ? 'history-item--selected' : ''}}" wx:for="{{historyModal.list}}" wx:key="index"
               data-idx="{{index}}" catchtap="onHistoryPick">
           <image wx:if="{{item._photoUrl}}" class="history-item-photo"
                src="{{item._photoUrl}}" mode="aspectFill" lazy-load
                data-idx="{{index}}" catchtap="onHistoryPhotoTap"/>
-          <view class="history-item-main">
-            <text class="history-item-brand">{{item._brandDisp}}</text>
-            <text wx:if="{{item.scale}}" class="history-item-scale">{{item.scale}}cm</text>
+          <view class="history-item-main-col">
+            <view class="history-item-main">
+              <text class="history-item-brand">{{item._brandDisp}}</text>
+              <text wx:if="{{item.scale}}" class="history-item-scale">{{item.scale}}cm</text>
+            </view>
+            <text wx:if="{{item._serialText}}" class="history-item-serial">序列号：{{item._serialText}}</text>
           </view>
-          <text class="history-item-date">上次养护 {{item._dateStr}}</text>
-          <van-icon name="arrow" size="14px" color="#bfc7d1"/>
+          <text class="history-item-date">{{item._dateStr}}</text>
+          <van-icon name="{{item._selected ? 'checked' : 'arrow'}}" size="15px" color="{{item._selected ? '#006495' : '#bfc7d1'}}"/>
         </view>
       </scroll-view>
       <view class="history-manual">
-        <view class="history-manual-label">不在列表里？直接填写新装备：</view>
+        <view class="history-manual-label">不在列表里？直接录入新装备（结算时自动加入列表）：</view>
         <view class="kv-row">
           <view class="kv-cell">
             <text class="kv-label">品牌</text>
@@ -416,10 +459,15 @@
                    bindinput="onHistoryScaleInput"/>
           </view>
         </view>
+        <input class="form-input history-serial-input"
+               value="{{historyModal.serials}}"
+               placeholder="序列号（选填）"
+               placeholder-class="form-input-placeholder"
+               bindinput="onHistorySerialInput"/>
       </view>
       <view class="amount-modal-footer">
         <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onHistoryClose">跳过</view>
-        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onHistoryManualConfirm">确认填写</view>
+        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onHistoryManualConfirm">确认新装备</view>
       </view>
     </view>
   </van-popup>

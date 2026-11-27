@@ -795,6 +795,31 @@ const uploadFilePromise = function (mainId, filePath, purpose, type, sessionKey,
     })
   })
 }
+// 会员名下装备列表与管理（店员侧）
+const getMemberEquipmentsByStaffPromise = function (memberId, equipment, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'MemberEquipment/ListByStaff?memberId=' + memberId
+    + (equipment ? '&equipment=' + encodeURIComponent(equipment) : '')
+    + '&sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(getUrl, undefined)
+}
+const createMemberEquipmentByStaffPromise = function (payload, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberEquipment/CreateByStaff?sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(url, payload || {})
+}
+const updateMemberEquipmentByStaffPromise = function (payload, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberEquipment/UpdateByStaff?sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(url, payload || {})
+}
+const deleteMemberEquipmentByStaffPromise = function (id, sessionKey) {
+  var url = app.globalData.requestPrefix + 'MemberEquipment/DeleteByStaff?sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(url, { id: id })
+}
+const getMemberEquipmentHistoryByStaffPromise = function (id, sessionKey) {
+  var getUrl = app.globalData.requestPrefix + 'MemberEquipment/GetHistoryByStaff?id=' + id
+    + '&sessionKey=' + encodeURIComponent(sessionKey || '')
+  return util.performWebRequest(getUrl, undefined)
+}
+
 // 会员养护过的装备列表（按装备类型，brand+scale 去重、按最近养护时间倒序）
 const getMemberCaredEquipmentsPromise = function (memberId, equipment, sessionKey) {
   var getUrl = app.globalData.requestPrefix + 'Care/GetMemberCaredEquipments?memberId=' + memberId
@@ -2208,6 +2233,11 @@ module.exports = {
   getEquipBrandsPromise,
   uploadFilePromise,
   getCareOthersServicePromise,
+  getMemberEquipmentsByStaffPromise,
+  createMemberEquipmentByStaffPromise,
+  updateMemberEquipmentByStaffPromise,
+  deleteMemberEquipmentByStaffPromise,
+  getMemberEquipmentHistoryByStaffPromise,
   getMemberCaredEquipmentsPromise,
   getMemberLatestSafeCheckPromise,
   getCareProductPromise,
