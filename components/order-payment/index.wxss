@@ -191,14 +191,16 @@
 /* 零金额确认 */
 .zero-amount-confirm { padding: 32rpx 24rpx; text-align: center; }
 .zero-amount-tip { font-size: 28rpx; color: #3f4850; margin-bottom: 32rpx; }
-.zero-amount-btn { background: #006495; color: #fff; border-radius: 8rpx;
-                   font-size: 32rpx; height: 88rpx; line-height: 88rpx; }
+.zero-amount-btn { width: 100%; height: 88rpx; background: #006495; color: #fff; border: none;
+                   border-radius: 8rpx; font-size: 32rpx; font-weight: 600; line-height: 1.2;
+                   padding: 0; display: flex; align-items: center; justify-content: center; }
 
 /* 养护核销 */
 .care-writeoff { padding: 24rpx; text-align: center; }
 .care-writeoff-tip { font-size: 26rpx; color: #3f4850; line-height: 1.5; margin-bottom: 28rpx; }
-.care-writeoff-btn { background: #006495; color: #fff; border-radius: 8rpx;
-                     font-size: 30rpx; height: 88rpx; line-height: 88rpx; }
+.care-writeoff-btn { width: 100%; height: 88rpx; background: #006495; color: #fff; border: none;
+                     border-radius: 8rpx; font-size: 30rpx; font-weight: 600; line-height: 1.2;
+                     padding: 0; display: flex; align-items: center; justify-content: center; }
 .care-pay-hint { margin-top: 12rpx; font-size: 24rpx; color: #E64340; text-align: center; }
 
 /* 微信身份核验二维码弹层 */
@@ -213,5 +215,7 @@
 .verify-dot { width: 14rpx; height: 14rpx; border-radius: 50%; background: #4aa9e9;
               animation: verify-pulse 1.2s infinite; }
 @keyframes verify-pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
-.verify-cancel { margin-top: 28rpx; width: 240rpx; background: #f2f3f5; color: #3f4850;
-                 border-radius: 8rpx; font-size: 28rpx; height: 76rpx; line-height: 76rpx; }
+.verify-cancel { margin-top: 28rpx; width: 240rpx; height: 76rpx; background: #f2f3f5; color: #3f4850;
+                 border: none; border-radius: 8rpx; font-size: 28rpx; line-height: 1.2;
+                 padding: 0; display: flex; align-items: center; justify-content: center; }
+.zero-amount-btn::after, .care-writeoff-btn::after, .verify-cancel::after { border: none; }
