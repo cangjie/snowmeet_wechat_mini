@@ -1,6 +1,6 @@
 // 会员养护装备列表单元测试：
 //   1. member_equipment_diff 纯函数（序列号左右拆合、已选装备变更检测与提示文案）
-//   2. care_recept_form 开单联动（选板从装备列表加载、当次照片仍必填、未改不弹窗、改了在去结算弹窗确认/取消、换会员解绑、改为新装备）
+//   2. care_recept_form 开单联动（选板从装备列表加载、改品牌/长度立即弹更新旧装备或另存为新装备、未改不弹窗、遮罩取消回滚、仅改序列号去结算提示、换会员解绑）
 //   3. member_equips 管理页（分类统计、新增/编辑/删除、查看修改历史）与 member_detail 入口跳转
 const test = require('node:test')
 const assert = require('node:assert/strict')
@@ -35,7 +35,7 @@ function setupForm(t, opts) {
   }
   t.after(() => { global.getApp = oldApp; global.wx = oldWx })
 
-  const memberEquips = opts.memberEquips || [
+  const memberEquips = (opts.memberEquips || [
     {
       id: 42,
       member_id: 301,
@@ -43,11 +43,13 @@ function setupForm(t, opts) {
       brand: 'Atomic/阿托米克',
       scale: '165',
       serials: 'L100|R200',
+      image_id: 77,
       photoUrl: 'https://img.test/first_t.jpg',
       photoFullUrl: 'https://img.test/first.jpg',
       last_care_date: '2026-11-20T10:00:00'
     }
-  ]
+  ]).map((x) => Object.assign({}, x))
+  const updateCalls = []
 
   const form = loadComponent(FORM, {
     IMAGE_HOST: 'https://img.test',
@@ -55,8 +57,24 @@ function setupForm(t, opts) {
     getMemberCardsPromise: async () => [],
     getMemberAssetsByStaffPromise: async () => ({ depositTotal: 0 }),
     getMemberEquipmentsByStaffPromise: async (mid, eq) =>
-      eq ? memberEquips.filter((x) => x.equipment === eq) : memberEquips,
+      (eq ? memberEquips.filter((x) => x.equipment === eq) : memberEquips).map((x) => Object.assign({}, x)),
     getMemberCaredEquipmentsPromise: async () => [],
+    updateMemberEquipmentByStaffPromise: async (payload) => {
+      updateCalls.push(payload)
+      if (opts.updateReject) throw new Error('network error')
+      const idx = memberEquips.findIndex((x) => x.id === payload.id)
+      const updated = Object.assign({}, idx >= 0 ? memberEquips[idx] : {}, {
+        id: payload.id,
+        member_id: payload.memberId,
+        equipment: payload.equipment,
+        brand: payload.brand,
+        scale: payload.scale,
+        serials: payload.serials,
+        image_id: payload.imageId,
+      })
+      if (idx >= 0) memberEquips[idx] = updated
+      return updated
+    },
     calcCareChargePromise: async (req) => ({ care: Object.assign({}, req.care) })
   })
 
@@ -73,6 +91,8 @@ function setupForm(t, opts) {
     form,
     toasts,
     modals,
+    updateCalls,
+    memberEquips,
     setModalConfirm: (v) => { modalConfirm = v }
   }
 }
@@ -104,6 +124,26 @@ test('变更检测：对比已选会员装备快照，准确输出修改项与�
   assert.match(text, /品牌：Atomic\/阿托米克 → Head\/海德/)
   assert.match(text, /长度：165cm → 170cm/)
   assert.match(text, /序列号：SN1 → 未填/)
+
+  const singleBrand = equipDiff.formatSingleFieldChange(
+    { equipment: '双板', brand: 'Head/海德', scale: '165' },
+    origin,
+    'brand',
+    'Atomic/阿托米克',
+    'Head/海德'
+  )
+  assert.equal(singleBrand.equipSummary, '双板 · Atomic · 165cm')
+  assert.equal(singleBrand.changeLine, '品牌：Atomic/阿托米克 → Head/海德')
+
+  const singleScale = equipDiff.formatSingleFieldChange(
+    { equipment: '双板', brand: 'Atomic/阿托米克', scale: '170' },
+    origin,
+    'scale',
+    '165',
+    '170'
+  )
+  assert.equal(singleScale.equipSummary, '双板 · Atomic · 165cm')
+  assert.equal(singleScale.changeLine, '长度：165cm → 170cm')
 })
 
 /* ---------- 2. 养护开单组件联动 ---------- */
@@ -146,7 +186,78 @@ test('开单选板：点双板从装备列表加载并选中，带入品牌/长�
   assert.equal(checkouts[0].detail.cares[0].member_equipment_id, 42)
 })
 
-test('开单改板：选中已有装备后修改长度或序列号，点去结算先弹窗提示；取消不提交，确认才提交', async (t) => {
+test('修改长度失焦立即弹窗：选「更新旧装备」直接保存并保留档案图片，结算不重复弹窗', async (t) => {
+  const { form, modals, updateCalls } = setupForm(t)
+  form.onAddCare()
+  form.onEquipTap(tap({ cidx: 0, equip: '双板' }))
+  await settle()
+  form.onHistoryPick(tap({ idx: 0 }))
+  form._mutate(0, (c) => { c.careImages = [photo()]; c.need_edge = 1; c.edge_degree = '89' })
+  await settle()
+
+  // 修改长度并失焦 -> 立即弹出居中选择框
+  form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: '170' } })
+  assert.equal(form.data.equipChangeModal.show, true)
+  assert.equal(form.data.equipChangeModal.equipSummary, '双板 · Atomic · 165cm')
+  assert.equal(form.data.equipChangeModal.changeLine, '长度：165cm → 170cm')
+
+  // 选择「更新旧装备」-> 立即调接口更新，完整保留 imageId = 77
+  await form.onEquipChangeUpdateOld()
+  await settle()
+  assert.equal(form.data.equipChangeModal.show, false)
+  assert.equal(updateCalls.length, 1)
+  assert.equal(updateCalls[0].id, 42)
+  assert.equal(updateCalls[0].scale, '170')
+  assert.equal(updateCalls[0].imageId, 77)
+  assert.equal(form.data.displayCares[0]._equipModified, false)
+
+  // 去结算不再二次弹窗，保留 member_equipment_id = 42 与新长度 170
+  await form.onCheckout()
+  assert.equal(modals.length, 0)
+  const checkouts = form.events.filter((e) => e.name === 'checkout')
+  assert.equal(checkouts.length, 1)
+  assert.equal(checkouts[0].detail.cares[0].member_equipment_id, 42)
+  assert.equal(checkouts[0].detail.cares[0].scale, '170')
+})
+
+test('修改品牌立即弹窗：选「另存为新装备」解绑并清空旧序列号，再改长度不重复弹窗', async (t) => {
+  const { form, modals, updateCalls } = setupForm(t)
+  form.onAddCare()
+  form.onEquipTap(tap({ cidx: 0, equip: '双板' }))
+  await settle()
+  form.onHistoryPick(tap({ idx: 0 }))
+  form._mutate(0, (c) => { c.careImages = [photo()]; c.need_edge = 1; c.edge_degree = '89' })
+  await settle()
+
+  // 切换品牌为 Head/海德 -> 立即弹窗
+  form.onBrandChange({ currentTarget: { dataset: { cidx: 0 } }, detail: { value: 1 } })
+  assert.equal(form.data.equipChangeModal.show, true)
+  assert.equal(form.data.equipChangeModal.changeLine, '品牌：Atomic/阿托米克 → Head/海德')
+
+  // 选「另存为新装备」-> 解绑为 -1、保留新品牌、清空自动带入的旧板序列号
+  form.onEquipChangeSaveAsNew()
+  await settle()
+  assert.equal(form.data.equipChangeModal.show, false)
+  assert.equal(updateCalls.length, 0)
+  assert.equal(form.data.displayCares[0].member_equipment_id, -1)
+  assert.equal(form.data.displayCares[0].brand, 'Head/海德')
+  assert.equal(form.data.displayCares[0].serials, null)
+
+  // 已转为新装备，再修改长度失焦不再弹窗
+  form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: '175' } })
+  assert.equal(form.data.equipChangeModal.show, false)
+  await settle()
+
+  await form.onCheckout()
+  assert.equal(modals.length, 0)
+  const checkouts = form.events.filter((e) => e.name === 'checkout')
+  assert.equal(checkouts.length, 1)
+  assert.equal(checkouts[0].detail.cares[0].member_equipment_id, -1)
+  assert.equal(checkouts[0].detail.cares[0].brand, 'Head/海德')
+  assert.equal(checkouts[0].detail.cares[0].scale, '175')
+})
+
+test('未实际改值不弹窗；点击遮罩取消回滚原值；仅改序列号结算前4字按钮弹窗确认', async (t) => {
   const { form, modals, setModalConfirm } = setupForm(t)
   form.onAddCare()
   form.onEquipTap(tap({ cidx: 0, equip: '双板' }))
@@ -155,26 +266,42 @@ test('开单改板：选中已有装备后修改长度或序列号，点去结�
   form._mutate(0, (c) => { c.careImages = [photo()]; c.need_edge = 1; c.edge_degree = '89' })
   await settle()
 
-  // 修改长度为 170
-  form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: '170' } })
+  // 长度传原值/前后空白、品牌选原品牌均不弹窗
+  form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: ' 165 ' } })
+  assert.equal(form.data.equipChangeModal.show, false)
+  form.onBrandChange({ currentTarget: { dataset: { cidx: 0 } }, detail: { value: 0 } })
+  assert.equal(form.data.equipChangeModal.show, false)
+
+  // 改长度后点遮罩取消 -> 回滚原长度 165，保留原关联 id = 42
+  form.onFieldBlur({ currentTarget: { dataset: { cidx: 0, field: 'scale' } }, detail: { value: '172' } })
+  assert.equal(form.data.equipChangeModal.show, true)
+  form.onEquipChangeCancel()
   await settle()
+  assert.equal(form.data.equipChangeModal.show, false)
+  assert.equal(form.data.displayCares[0].scale, '165')
+  assert.equal(form.data.displayCares[0].member_equipment_id, 42)
+
+  // 仅改序列号：失焦不弹品牌/长度弹窗，但点去结算触发 4 字按钮兜底确认
+  form.onSerialBlur({ currentTarget: { dataset: { cidx: 0, side: 'left' } }, detail: { value: 'L999' } })
+  assert.equal(form.data.equipChangeModal.show, false)
   assert.equal(form.data.displayCares[0]._equipModified, true)
 
-  // 第一次点返回检查（取消）：不触发 checkout
   setModalConfirm(false)
   await form.onCheckout()
   assert.equal(modals.length, 1)
-  assert.match(modals[0].content, /165cm → 170cm/)
+  assert.equal(modals[0].confirmText, '确认更新')
+  assert.equal(modals[0].cancelText, '返回检查')
+  assert.ok(modals[0].confirmText.length <= 4 && modals[0].cancelText.length <= 4)
+  assert.match(modals[0].content, /左:L100 \/ 右:R200 → 左:L999 \/ 右:R200/)
   assert.equal(form.events.filter((e) => e.name === 'checkout').length, 0)
 
-  // 第二次点保存并结算（确认）：触发 checkout，保留 member_equipment_id = 42 与新长度 170
   setModalConfirm(true)
   await form.onCheckout()
   assert.equal(modals.length, 2)
   const checkouts = form.events.filter((e) => e.name === 'checkout')
   assert.equal(checkouts.length, 1)
   assert.equal(checkouts[0].detail.cares[0].member_equipment_id, 42)
-  assert.equal(checkouts[0].detail.cares[0].scale, '170')
+  assert.equal(checkouts[0].detail.cares[0].serials, 'L999|R200')
 })
 
 test('改为新装备或切换会员：解除已有装备关联，避免误改他人或原装备', async (t) => {

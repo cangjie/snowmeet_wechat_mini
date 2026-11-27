@@ -68,6 +68,37 @@ function snapshotFromEquipment(item) {
     brand: normalizeText(item.brand),
     scale: normalizeText(item.scale),
     serials: normalizeSerials(item.serials),
+    image_id: Number(item.image_id) > 0 ? Number(item.image_id) : null,
+  };
+}
+
+function formatSingleFieldChange(care, origin, field, prevVal, nextVal) {
+  const equip = normalizeText((origin && origin.equipment) || (care && care.equipment)) || '装备';
+  const prevBrand = field === 'brand'
+    ? normalizeText(prevVal)
+    : normalizeText((origin && origin.brand) || (care && care.brand));
+  const prevScale = field === 'scale'
+    ? normalizeText(prevVal)
+    : normalizeText((origin && origin.scale) || (care && care.scale));
+  const summaryParts = [equip];
+  const shortBrand = brandShortName(prevBrand);
+  if (shortBrand) summaryParts.push(shortBrand);
+  if (prevScale) summaryParts.push(prevScale + 'cm');
+
+  let changeLine = '';
+  if (field === 'brand') {
+    changeLine = '品牌：' + (normalizeText(prevVal) || '未填') + ' → ' + (normalizeText(nextVal) || '未填');
+  } else if (field === 'scale') {
+    const fromScale = normalizeText(prevVal) ? normalizeText(prevVal) + 'cm' : '未填';
+    const toScale = normalizeText(nextVal) ? normalizeText(nextVal) + 'cm' : '未填';
+    changeLine = '长度：' + fromScale + ' → ' + toScale;
+  } else {
+    changeLine = normalizeText(field) + '：' + (normalizeText(prevVal) || '未填') + ' → ' + (normalizeText(nextVal) || '未填');
+  }
+
+  return {
+    equipSummary: summaryParts.join(' · '),
+    changeLine,
   };
 }
 
@@ -168,4 +199,5 @@ module.exports = {
   diffCareAgainstOrigin,
   collectModifiedEquipments,
   formatConfirmContent,
+  formatSingleFieldChange,
 };

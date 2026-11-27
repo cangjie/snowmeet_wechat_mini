@@ -108,7 +108,7 @@
 
               <!-- 已关联会员装备状态条（支持一键改为录入新装备） -->
               <view wx:if="{{care._linkedEquipId > 0 && !care.card_equip_lock}}" class="linked-equip-bar {{care._equipModified ? 'linked-equip-bar--modified' : ''}}">
-                <text class="linked-equip-txt">{{care._equipModified ? '已修改所选会员装备（结算时将提示保存并记历史）' : '已选用会员名下装备'}}</text>
+                <text class="linked-equip-txt">{{care._equipModified ? '已修改序列号（结算时将同步更新装备记录）' : '已选用会员名下装备'}}</text>
                 <text class="linked-equip-action" data-cidx="{{cidx}}" catchtap="onUnlinkEquipment">改为新装备</text>
               </view>
 
@@ -468,6 +468,22 @@
       <view class="amount-modal-footer">
         <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onHistoryClose">跳过</view>
         <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onHistoryManualConfirm">确认新装备</view>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 已选旧装备修改品牌/长度后的立即确认弹窗：更新旧装备 vs 另存为新装备 -->
+  <van-popup show="{{equipChangeModal.show}}" position="center" round custom-style="width: 600rpx;" z-index="1100" bind:close="onEquipChangeCancel">
+    <view class="amount-modal equip-change-modal">
+      <view class="amount-modal-title">已选装备信息变更</view>
+      <view class="equip-change-body">
+        <view class="equip-change-origin">原装备：{{equipChangeModal.equipSummary}}</view>
+        <view class="equip-change-diff">{{equipChangeModal.changeLine}}</view>
+        <view class="equip-change-question">要更新这件旧装备的信息，还是另存为新装备？</view>
+      </view>
+      <view class="amount-modal-footer equip-change-footer">
+        <view class="amount-modal-btn amount-modal-btn--cancel" catchtap="onEquipChangeSaveAsNew">另存为新装备</view>
+        <view class="amount-modal-btn amount-modal-btn--confirm" catchtap="onEquipChangeUpdateOld">{{equipChangeModal.saving ? '更新中…' : '更新旧装备'}}</view>
       </view>
     </view>
   </van-popup>

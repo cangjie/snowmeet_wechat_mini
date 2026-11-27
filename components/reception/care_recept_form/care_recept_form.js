@@ -227,6 +227,8 @@ Component({
     // 会员装备选择弹层：会员选定装备类型后，从其名下装备列表读取同类型装备供选择；
     // 也可在弹层里填写新装备（下单提交时自动加入该会员装备列表）
     historyModal: { show: false, cidx: -1, equip: '', list: [], brandListView: [], brandIndex: null, brand: '', scale: '', serials: '' },
+    // 已选旧装备修改品牌/长度后的立即确认弹窗（更新旧装备 vs 另存为新装备）
+    equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
     expandedMap: {},
   },
   observers: {
@@ -942,7 +944,16 @@ Component({
         this.setData({ addBrand: { show: true, cidx, name: '', chineseName: '' } });
         return;
       }
-      this._mutate(cidx, (c) => { c.brand = brandList[idx].displayedName; });
+      const prevBrand = equipDiff.normalizeText(care && care.brand);
+      const newBrand = brandList[idx].displayedName;
+      const nextBrand = equipDiff.normalizeText(newBrand);
+      if (prevBrand === nextBrand) return;
+      const equipId = Number(care && care.member_equipment_id) || 0;
+      const locked = !!(care && care.card_equip_lock);
+      this._mutate(cidx, (c) => { c.brand = newBrand; });
+      if (equipId > 0 && !locked) {
+        this._promptLinkedEquipChange(cidx, 'brand', prevBrand, nextBrand);
+      }
     },
     onAddBrandInput(e) {
       const field = e.currentTarget.dataset.field;
@@ -966,8 +977,18 @@ Component({
       util.performWebRequest(url, null).then((brandList) => {
         const patch = care.equipment === '单板' ? { boardBrandList: brandList || [] } : { skiBrandList: brandList || [] };
         that.setData({ ...patch, 'addBrand.show': false });
+        const latest = that.data.displayCares[cidx] || care;
+        const prevBrand = equipDiff.normalizeText(latest && latest.brand);
         const added = (brandList || []).find((b) => b.brand_name === name);
-        that._mutate(cidx, (c) => { c.brand = added ? added.displayedName : (name + '/' + (chineseName || '')); });
+        const newBrand = added ? added.displayedName : (name + '/' + (chineseName || ''));
+        const nextBrand = equipDiff.normalizeText(newBrand);
+        if (prevBrand === nextBrand) return;
+        const equipId = Number(latest && latest.member_equipment_id) || 0;
+        const locked = !!(latest && latest.card_equip_lock);
+        that._mutate(cidx, (c) => { c.brand = newBrand; });
+        if (equipId > 0 && !locked) {
+          that._promptLinkedEquipChange(cidx, 'brand', prevBrand, nextBrand);
+        }
       }).catch(() => {
         wx.showToast({ title: '新增品牌失败', icon: 'none' });
       });
@@ -977,8 +998,132 @@ Component({
       const field = e.currentTarget.dataset.field;
       const value = e.detail.value;
       const cur = this.data.displayCares[cidx];
-      if (field === 'scale' && cur && cur.card_equip_lock) return; // 限装备季卡：长度锁定
+      if (field === 'scale') {
+        if (cur && cur.card_equip_lock) return; // 限装备季卡：长度锁定
+        const prevScale = equipDiff.normalizeText(cur && cur.scale);
+        const nextScale = equipDiff.normalizeText(value);
+        if (prevScale === nextScale) return;
+        const equipId = Number(cur && cur.member_equipment_id) || 0;
+        this._mutate(cidx, (c) => { c.scale = nextScale || null; });
+        if (equipId > 0) {
+          this._promptLinkedEquipChange(cidx, 'scale', prevScale, nextScale);
+        }
+        return;
+      }
       this._mutate(cidx, (c) => { c[field] = value === '' ? null : value; });
+    },
+    _promptLinkedEquipChange(cidx, field, prevValue, nextValue) {
+      const cur = this.data.displayCares[cidx];
+      const equipId = Number(cur && cur.member_equipment_id) || 0;
+      if (!cur || equipId <= 0) return;
+      const origin = (this._equipOriginById && this._equipOriginById[equipId]) || cur._equipOrigin || null;
+      const { equipSummary, changeLine } = equipDiff.formatSingleFieldChange(cur, origin, field, prevValue, nextValue);
+      this.setData({
+        equipChangeModal: {
+          show: true,
+          cidx,
+          equipId,
+          field,
+          prevValue,
+          equipSummary,
+          changeLine,
+          saving: false,
+        },
+      });
+    },
+    async onEquipChangeUpdateOld() {
+      const m = this.data.equipChangeModal;
+      if (!m || !m.show || m.saving) return;
+      const cur = this.data.displayCares[m.cidx];
+      if (!cur || Number(cur.member_equipment_id) !== m.equipId) {
+        this.setData({ 'equipChangeModal.show': false });
+        return;
+      }
+      this.setData({ 'equipChangeModal.saving': true });
+      let origin = (this._equipOriginById && this._equipOriginById[m.equipId]) || cur._equipOrigin || null;
+      const memberId = Number(this.data.memberId) || 0;
+      // 若恢复中断草稿尚未拉取过会员装备列表，先查一次补全原装备 image_id，避免更新时误清空首单代表图
+      if (!origin && memberId > 0) {
+        try {
+          const allEquips = await this._fetchMemberEquips(memberId, '');
+          this._rememberEquipOrigins(allEquips);
+          origin = (this._equipOriginById && this._equipOriginById[m.equipId]) || null;
+        } catch (_) {}
+      }
+      const fallbackItem = {
+        id: m.equipId,
+        equipment: cur.equipment,
+        brand: cur.brand,
+        scale: cur.scale,
+        serials: cur.serials,
+        image_id: origin ? origin.image_id : null,
+      };
+      let updatedImmediately = false;
+      if (typeof data.updateMemberEquipmentByStaffPromise === 'function') {
+        try {
+          const updated = await data.updateMemberEquipmentByStaffPromise({
+            id: m.equipId,
+            memberId,
+            equipment: cur.equipment,
+            brand: cur.brand || null,
+            scale: cur.scale || null,
+            serials: equipDiff.normalizeSerials(cur.serials) || null,
+            imageId: origin ? origin.image_id : null,
+          }, app.globalData.sessionKey);
+          this._rememberEquipOrigins([updated && Number(updated.id) > 0 ? updated : fallbackItem]);
+          updatedImmediately = true;
+        } catch (_) {
+          // 网络异常或后端尚未部署时，刷新本地快照并由结算接口兜底同步与记历史
+          this._rememberEquipOrigins([fallbackItem]);
+        }
+      } else {
+        this._rememberEquipOrigins([fallbackItem]);
+      }
+      if (this.data.cares && this.data.cares[m.cidx]) {
+        delete this.data.cares[m.cidx]._equipOrigin;
+      }
+      this.setData({
+        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
+      });
+      this._refreshCares();
+      wx.showToast({
+        title: updatedImmediately ? '已更新旧装备信息' : '已确认更新，结算时同步保存',
+        icon: 'none',
+      });
+    },
+    onEquipChangeSaveAsNew() {
+      const m = this.data.equipChangeModal;
+      if (!m || !m.show || m.saving) return;
+      const cur = this.data.displayCares[m.cidx];
+      const origin = (this._equipOriginById && this._equipOriginById[m.equipId]) || (cur && cur._equipOrigin) || null;
+      this.setData({
+        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
+      });
+      if (!cur) return;
+      const originSerial = origin ? equipDiff.normalizeSerials(origin.serials) : '';
+      const curSerial = equipDiff.normalizeSerials(cur.serials);
+      const shouldClearCopiedSerial = !!(originSerial && curSerial === originSerial);
+      if (shouldClearCopiedSerial && cur._key && this._diffSerialMap) {
+        delete this._diffSerialMap[cur._key];
+      }
+      this._mutate(m.cidx, (c) => {
+        c.member_equipment_id = equipDiff.ExplicitNewSentinel;
+        if (shouldClearCopiedSerial) c.serials = null;
+      }, true, false);
+      wx.showToast({ title: '已改为另存新装备', icon: 'none' });
+    },
+    onEquipChangeCancel() {
+      const m = this.data.equipChangeModal;
+      if (!m || !m.show || m.saving) return;
+      const { cidx, field, prevValue } = m;
+      this.setData({
+        equipChangeModal: { show: false, cidx: -1, equipId: 0, field: '', prevValue: '', equipSummary: '', changeLine: '', saving: false },
+      });
+      if (field && this.data.displayCares[cidx]) {
+        this._mutate(cidx, (c) => {
+          c[field] = prevValue || null;
+        });
+      }
     },
     /* ---------- 服务项 ---------- */
     onSvcToggle(e) {
@@ -1948,7 +2093,7 @@ Component({
         wx.showModal({
           title: '确认修改会员装备',
           content: equipDiff.formatConfirmContent(modified),
-          confirmText: '保存并结算',
+          confirmText: '确认更新',
           cancelText: '返回检查',
           success(res) {
             resolve(!!(res && res.confirm));
