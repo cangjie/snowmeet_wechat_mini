@@ -152,6 +152,7 @@
         <view class="care-head-left">
           <text class="care-title">{{care._title}}</text>
           <view class="chip {{care._status === '已完成' ? 'chip-success' : (care._status === '已取消' ? 'chip-pending' : (care._status === '未开始' ? 'chip-muted' : 'chip-primary'))}}">{{care._status}}</view>
+          <view wx:if="{{care._equipDiffLines.length > 0}}" class="chip chip-diff">与装备列表不一致</view>
         </view>
         <van-icon name="{{care._expanded ? 'arrow-up' : 'arrow-down'}}" size="16px" color="#6f7881"/>
       </view>
@@ -208,6 +209,11 @@
             <text class="info-label">前脚</text>
             <text class="info-value">{{care.board_front === '左' ? '左脚' : (care.board_front === '右' ? '右脚' : '--')}}</text>
           </view>
+        </view>
+
+        <!-- 订单和顾客装备列表对不上的项（只做标注） -->
+        <view wx:if="{{care._equipDiffLines.length > 0}}" class="equip-diff">
+          <text wx:for="{{care._equipDiffLines}}" wx:key="field" wx:for-item="line" class="equip-diff-line">⚠ {{line.text}}</text>
         </view>
 
         <block wx:if="{{!care._editing}}">

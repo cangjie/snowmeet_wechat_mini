@@ -11,6 +11,7 @@ const data = require('../../../../utils/data.js');
 const repairMedia = require('../../../../utils/care_repair_media.js');
 const careOrderRows = require('../../../../utils/care_order_rows.js');
 const edgeLabel = require('../../../../utils/care_edge_label.js');
+const equipmentDiff = require('../../../../utils/member_equipment_diff.js');
 
 // 临时（用户 2026-11-25）：手头没有打印机没法测试，点「重新打印标签存根」按钮就算重新打印了（清掉「角度改过、标签没重打」）。
 // 有打印机后改成 false：状态只在 print-care 发出 printed（标签真的打完）时才清，见 onLabelPrinted。
@@ -324,6 +325,8 @@ Page({
     });
     care._chips = chips;
     care._extrasText = careOrderRows.equipmentExtras(care).map((ex) => (ex.key === 'bag' ? '雪包' : '雪杖')).join(' ');
+    // 订单里的装备信息和顾客装备列表里对应那件不一样（匹配不到时后端不给差异，旧后端没有这个字段）
+    care._equipDiffLines = equipmentDiff.formatEquipmentDiffs(care.equipmentDiffs);
     // 用了卡/券 → chips 行显示卡券 icon，点击 toast 详情（onBenefitTap）
     care._hasBenefit = !!(care.use_card && care.card_id)
       || !!(care.ticket_code && String(care.ticket_code).trim());

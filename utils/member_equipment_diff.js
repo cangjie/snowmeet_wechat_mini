@@ -55,6 +55,19 @@ function formatSerialsDisplay(raw) {
   return norm;
 }
 
+const EQUIPMENT_DIFF_LABELS = { equipment: '类型', brand: '品牌', scale: '长度', serials: '序列号' };
+
+// 养护订单详情页的标注文字。diffs 是后端给的 equipmentDiffs（订单和装备列表里对应那件不一样的项），逐项写出装备列表里的值。
+function formatEquipmentDiffs(diffs) {
+  if (!Array.isArray(diffs)) return [];
+  return diffs
+    .filter((d) => d && EQUIPMENT_DIFF_LABELS[d.field])
+    .map((d) => {
+      const value = d.field === 'serials' ? formatSerialsDisplay(d.listValue) : normalizeText(d.listValue);
+      return { field: d.field, text: '装备列表中的' + EQUIPMENT_DIFF_LABELS[d.field] + '：' + (value || '未填') };
+    });
+}
+
 function brandShortName(brand) {
   const s = normalizeText(brand);
   return s ? s.split('/')[0] : '';
@@ -210,6 +223,7 @@ module.exports = {
   splitSerials,
   composeSerials,
   formatSerialsDisplay,
+  formatEquipmentDiffs,
   brandShortName,
   snapshotFromEquipment,
   diffCareAgainstOrigin,
