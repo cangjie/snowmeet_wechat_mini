@@ -167,7 +167,7 @@
         <view class="kv-cell">
           <text class="kv-label">姓名</text>
           <view class="kv-inline-value">
-            <text class="kv-value kv-value--inline kv-value--nowrap">{{order.customerCalledName || '—'}}</text>
+            <text class="kv-value kv-value--inline kv-value--nowrap {{order.member_id > 0 ? 'kv-value--link' : ''}}" bindtap="onMemberDetail">{{order.customerCalledName || '—'}}</text>
             <view class="chip {{order._memberTypeClass}}">{{order._memberTypeLabel}}</view>
           </view>
         </view>

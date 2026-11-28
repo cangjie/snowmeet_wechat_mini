@@ -1533,6 +1533,12 @@ Page({
     })
   },
 
+  onMemberDetail() {
+    var memberId = Number(this.data.order && this.data.order.member_id)
+    if (!Number.isSafeInteger(memberId) || memberId <= 0) return
+    wx.navigateTo({ url: '/pages/admin/member/member_detail?id=' + memberId })
+  },
+
   onCall() {
     var cell = this.data.order && this.data.order.member && this.data.order.member.cell
     if (!cell) return

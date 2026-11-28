@@ -28,7 +28,7 @@
       </view>
       <view class="info-cell">
         <text class="info-label">顾客</text>
-        <text class="info-value">{{order.contact_name || '散客'}}</text>
+        <text class="info-value {{order.member_id > 0 ? 'info-value--link' : ''}}" bindtap="onMemberDetail">{{order.contact_name || '散客'}}</text>
       </view>
       <view class="info-cell" bindtap="onCall">
         <text class="info-label">电话</text>

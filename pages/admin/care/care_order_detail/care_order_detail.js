@@ -741,6 +741,12 @@ Page({
       });
   },
 
+  onMemberDetail() {
+    const memberId = Number(this.data.order && this.data.order.member_id);
+    if (!Number.isSafeInteger(memberId) || memberId <= 0) return;
+    wx.navigateTo({ url: '/pages/admin/member/member_detail?id=' + memberId });
+  },
+
   onCall() {
     const num = this.data.order && this.data.order.contact_num;
     if (num) wx.makePhoneCall({ phoneNumber: num });
